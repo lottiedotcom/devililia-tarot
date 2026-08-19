@@ -93,24 +93,26 @@ body, html {
   animation: orb-jump 0.16s ease-out;
 }
 
-/* --- BIGGER STAR MOTES WITH MOBILE FIXES --- */
+/* --- GLIDING MOTES WITH CSS TRANSITION --- */
 .floating-mote {
   position: absolute;
-  width: 90px; /* Made even bigger */
+  width: 90px; 
   height: auto;
   cursor: pointer;
   z-index: 7;
   pointer-events: auto;
-  /* Blocks mobile "save image" popups and drag scrolling */
   touch-action: none;
   -webkit-touch-callout: none;
-  animation: mote-float 4.5s ease-in-out infinite alternate;
+  
+  /* CSS handles the bobbing and spinning... */
+  animation: mote-bob 4s ease-in-out infinite alternate;
+  /* ...while this handles gliding across the screen! */
+  transition: left 12s linear, top 12s linear; 
 }
 
-@keyframes mote-float {
-  0% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-24px) rotate(20deg); } 
-  100% { transform: translateY(12px) rotate(-20deg); }
+@keyframes mote-bob {
+  0% { transform: translateY(0px) rotate(-10deg); }
+  100% { transform: translateY(-20px) rotate(15deg); }
 }
 
 /* THE TRAPPED MOTE EFFECTS */
@@ -420,7 +422,7 @@ body, html {
 #tea-icon {
   width: 80px;
   margin-bottom: 15px;
-  animation: mote-float 3s infinite alternate ease-in-out;
+  animation: mote-bob 3s infinite alternate ease-in-out;
 }
 
 #tea-bar-bg {
