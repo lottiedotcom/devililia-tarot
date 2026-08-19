@@ -302,45 +302,29 @@ function spawnMote() {
   mote.style.top = `${startY}px`;
 
   let holdTimer;
-  let isHolding = false;
-  let touchMoved = false;
 
-  const startInteraction = (e) => {
+  mote.addEventListener('pointerdown', (e) => {
     e.stopPropagation();
     if(isCheckpointActive || isChimeActive) return;
-    isHolding = false;
-    touchMoved = false;
 
     if (isTrapped) {
       mote.classList.add('holding');
       holdTimer = setTimeout(() => {
-        isHolding = true;
         burstMote(e, mote, true); 
       }, 500); 
     } else {
       burstMote(e, mote, false); 
     }
-  };
+  });
 
-  const cancelInteraction = () => {
+  const cancelHold = () => {
     clearTimeout(holdTimer);
     mote.classList.remove('holding');
   };
-
-  const endInteraction = (e) => {
-    clearTimeout(holdTimer);
-    mote.classList.remove('holding');
-    if (e.cancelable && e.type === 'touchend') e.preventDefault();
-  };
-
-  mote.addEventListener('touchstart', startInteraction, { passive: true });
-  mote.addEventListener('touchmove', () => { touchMoved = true; cancelInteraction(); }, { passive: true });
-  mote.addEventListener('touchend', endInteraction);
-  mote.addEventListener('touchcancel', cancelInteraction);
-
-  mote.addEventListener('mousedown', startInteraction);
-  mote.addEventListener('mouseleave', cancelInteraction);
-  mote.addEventListener('mouseup', endInteraction);
+  
+  mote.addEventListener('pointerup', cancelHold);
+  mote.addEventListener('pointerleave', cancelHold);
+  mote.addEventListener('pointercancel', cancelHold);
 
   moteContainer.appendChild(mote);
   void mote.offsetWidth;
@@ -358,18 +342,15 @@ function burstMote(e, mote, wasTrapped) {
   const baseGain = Math.max(2, Math.floor(echoesPerSecond * 0.5) + 2);
   const totalGain = wasTrapped ? baseGain * 4 : baseGain; 
   
-  let clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : window.innerWidth / 2);
-  let clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : window.innerHeight / 2);
-  
   addEchoes(totalGain);
   increaseDrift();
   if (wasTrapped) increaseDrift(); 
   
-  createRipple(clientX, clientY);
+  createRipple(e.clientX, e.clientY);
   
   const thoughtsArray = wasTrapped ? trappedThoughts : moteThoughts;
   const thought = thoughtsArray[Math.floor(Math.random() * thoughtsArray.length)];
-  spawnFloatingText(clientX, clientY, thought);
+  spawnFloatingText(e.clientX, e.clientY, thought);
   
   mote.remove();
 }
@@ -517,56 +498,48 @@ loreCloseBtn.addEventListener('click', () => {
   loreOverlay.classList.add('hidden');
 });
 
-// CRITICAL FIX: Robust touch and mouse logic for Hold-to-Inspect
+// CRITICAL FIX: Pure pointer logic exactly like the motes
 function setupRoomItem(elementId, loreKey, tapCallback) {
   const el = document.getElementById(elementId);
   if (!el) return;
 
   let holdTimer;
   let isHolding = false;
-  let touchMoved = false;
 
-  el.addEventListener('contextmenu', (e) => e.preventDefault());
+  el.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+  });
 
-  const startInteraction = (e) => {
+  el.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (isCheckpointActive || isChimeActive) return;
-    isHolding = false;
-    touchMoved = false;
     
-    // Hold for 400ms to open lore (faster and more responsive)
+    isHolding = false;
+    
+    // Exact 500ms timer
     holdTimer = setTimeout(() => {
       isHolding = true;
       showLore(loreKey, el.src); 
-    }, 400); 
-  };
+    }, 500); 
+  });
 
-  const cancelInteraction = () => {
+  const cancelHold = () => {
     clearTimeout(holdTimer);
   };
 
-  const endInteraction = (e) => {
+  el.addEventListener('pointerup', (e) => {
     clearTimeout(holdTimer);
     
-    // Block mobile ghost clicks
-    if (e.cancelable && e.type === 'touchend') e.preventDefault();
-
-    if (!isHolding && !touchMoved && tapCallback) {
+    if (!isHolding && tapCallback) {
       tapCallback(e); 
     }
     
     setTimeout(() => { isHolding = false; }, 50); 
-  };
+  });
 
-  // NATIVE TOUCH (Mobile Fix)
-  el.addEventListener('touchstart', startInteraction, { passive: true });
-  el.addEventListener('touchmove', () => { touchMoved = true; cancelInteraction(); }, { passive: true });
-  el.addEventListener('touchend', endInteraction);
-  el.addEventListener('touchcancel', cancelInteraction);
-
-  // MOUSE EVENTS (Desktop Fallback)
-  el.addEventListener('mousedown', startInteraction);
-  el.addEventListener('mouseleave', cancelInteraction);
-  el.addEventListener('mouseup', endInteraction);
+  el.addEventListener('pointerleave', cancelHold);
+  el.addEventListener('pointercancel', cancelHold);
 }
 
 // --- INTERACTIVE ROOM ITEMS SETUP ---
@@ -643,6 +616,7 @@ setupRoomItem('room-polaroid', 'polaroid', null);
 setupRoomItem('room-moontear', 'moontear', null);
 setupRoomItem('room-clock', 'clock', null);
 setupRoomItem('room-pillow', 'pillow', null);
+
 
 setInterval(() => {
   if (echoesPerSecond > 0 && !isCheckpointActive && !isChimeActive) {
@@ -820,3 +794,4 @@ document.querySelectorAll('.tarot-card').forEach(card => {
 calculateEchoRate();
 renderShop();
 updateUI();
+
