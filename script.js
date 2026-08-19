@@ -33,34 +33,54 @@ gameplayAudio.volume = 0.5;
 const teatimerAudio = new Audio('assets/teatimer.mp3');
 teatimerAudio.volume = 0.6;
 
-// FIXED: Lowercase filename to match your repo
 const tarotAudio = new Audio('assets/tarotgameplay.mp3');
 tarotAudio.loop = true;
 tarotAudio.volume = 0.5;
 
-// FIXED AUDIO AUTOPLAY: Forces mobile browsers to allow the music
+// --- AUDIO AUTOPLAY FIX ---
+// This listens for ANY touch or click on the screen to bypass browser blocks
 let isAudioStarted = false;
 function initAudio() {
   if (!isAudioStarted) {
-    gameplayAudio.play().catch(e => console.log("Audio waiting for stronger interaction"));
+    gameplayAudio.play().catch(e => console.log("Waiting for user interaction..."));
     isAudioStarted = true;
   }
 }
-// Using both click and touchstart guarantees the music fires when the screen is tapped
-document.addEventListener('click', initAudio, { once: true });
-document.addEventListener('touchstart', initAudio, { once: true });
+['pointerdown', 'touchstart', 'click'].forEach(evt => {
+  document.addEventListener(evt, initAudio, { once: true });
+});
 
+// --- RECURRING TEA TIME LOGIC ---
+let firstTeaTriggered = false;
+let teaInterval;
 
+const teaDialogue = {
+  dialogue: "Your hands must be getting tired from catching all those echoes. I brewed this a while ago, though it hasn't lost its heat. You should sit with the quiet for a moment. The dust will still be here when you're ready.",
+  choices: [
+    { text: "Accept the tea and rest your hands.", path: "attachment", action: "startTea" },
+    { text: "Examine the cup's cracked glaze, but accept it.", path: "threshold", action: "startTea" },
+    { text: "Politely decline and keep your hands empty.", path: "void", followUp: "No? Ah... keeping your hands empty. I understand. Some people prefer not to leave fingerprints." }
+  ]
+};
+
+function triggerTeaTime() {
+  isCheckpointActive = true;
+  displayCheckpoint(teaDialogue);
+}
+
+function startTeaTimerInterval() {
+  clearInterval(teaInterval);
+  teaInterval = setInterval(() => {
+    if (!isCheckpointActive) triggerTeaTime();
+  }, 15 * 60 * 1000); // 15 minutes in milliseconds
+}
+
+// Start the 15-minute clock when the game loads
+startTeaTimerInterval();
+
+// --- STORY CHECKPOINTS ---
+// Notice the first tea checkpoint is removed from here since it's handled dynamically above!
 const checkpoints = [
-  {
-    trigger: 15,
-    completed: false,
-    dialogue: "You've been tapping away at those motes for a while now. Here... take a break. It's chamomile, even if it doesn't taste like much. Sometimes you just have to sit still in the quiet before your hands cramp up. Don't worry, the stardust isn't going anywhere.",
-    choices: [
-      { text: "Accept the tea.", path: "attachment", action: "startTea" },
-      { text: "Politely decline and look away.", path: "void", followUp: "No? Ah... keeping your hands empty. I understand. Some people prefer not to leave fingerprints." }
-    ]
-  },
   {
     trigger: 35,
     completed: false,
@@ -142,9 +162,10 @@ function updateTimeOfDay() {
 updateTimeOfDay();
 setInterval(updateTimeOfDay, 60000);
 
+// --- DRIFT PACING SLOWED DOWN BY 10x ---
 function increaseDrift() {
   if (isCheckpointActive || liminalDrift >= 100) return;
-  liminalDrift += 0.5; 
+  liminalDrift += 0.05; // Changed from 0.5 to make milestones take much longer!
   if (liminalDrift > 100) liminalDrift = 100;
   driftBarFill.style.width = `${liminalDrift}%`;
   checkTriggers();
@@ -215,6 +236,13 @@ function spawnFloatingText(x, y, text) {
 function addEchoes(amount) {
   echoes += amount;
   updateUI();
+
+  // Trigger first tea time at 500 echoes!
+  if (!firstTeaTriggered && echoes >= 500 && !isCheckpointActive) {
+    firstTeaTriggered = true;
+    triggerTeaTime();
+    startTeaTimerInterval(); // Reset the 15m timer so they don't get double tea
+  }
 }
 
 function calculateEchoRate() {
@@ -259,6 +287,13 @@ setInterval(() => {
   if (echoesPerSecond > 0 && !isCheckpointActive) {
     echoes += echoesPerSecond / 10;
     updateUI();
+
+    // Catch passive income triggering the 500 milestone
+    if (!firstTeaTriggered && echoes >= 500) {
+      firstTeaTriggered = true;
+      triggerTeaTime();
+      startTeaTimerInterval();
+    }
   }
 }, 100);
 
@@ -326,7 +361,9 @@ function handleChoice(choice, cp) {
 }
 
 function closeCheckpoint(cp) {
-  if(cp) cp.completed = true;
+  if (cp && cp.hasOwnProperty('completed')) {
+    cp.completed = true;
+  }
   dialogueOverlay.classList.add('hidden');
   setTimeout(() => { isCheckpointActive = false; }, 500); 
 }
