@@ -76,7 +76,7 @@ body, html {
 #crystal-orb {
   position: absolute;
   bottom: 18%; /* Dropped down to sit firmly on the desk */
-  left: 78%; /* Positioned right next to the candle */
+  left: 58%; /* Positioned right next to the candle */
   transform: translateX(-50%);
   width: 200px; /* Cranked the size way up */
   cursor: pointer;
