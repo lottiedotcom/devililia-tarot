@@ -1,4 +1,4 @@
-const CACHE_NAME = 'devililia-tarot-v1';
+const CACHE_NAME = 'devililia-tarot-v2'; // Bumped version to force cache update
 
 const urlsToCache = [
   './',
@@ -26,7 +26,7 @@ const urlsToCache = [
   './assets/gameplay.mp3',
   './assets/cardflip.mp3',
   './assets/teatimer.mp3',
-  './assets/Tarotgameplay.mp3'
+  './assets/tarotgameplay.mp3' // FIXED CASING
 ];
 
 self.addEventListener('install', event => {
