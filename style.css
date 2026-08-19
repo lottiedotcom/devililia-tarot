@@ -67,19 +67,20 @@ body, html {
   object-fit: contain;
   cursor: pointer;
   transition: transform 0.2s;
-  /* Removed the terrible padding hack! */
 }
 
 .room-item:active {
   transform: scale(0.95);
 }
 
-/* Base sizes slightly increased to naturally improve mobile tapping */
 #room-clock { top: 22%; left: 12%; width: 65px; }
 #room-mirror { top: 30%; right: 14%; width: 65px; }
 #room-polaroid { top: 42%; right: 11%; width: 85px; transform: rotate(5deg); }
 #room-letter { bottom: 22%; left: 48%; transform: translateX(-50%); width: 60px; z-index: 4; }
-#room-hourglass { bottom: 28%; left: 18%; width: 55px; z-index: 4; }
+
+/* MUCH BIGGER HOURGLASS */
+#room-hourglass { bottom: 27%; left: 15%; width: 85px; z-index: 4; }
+
 #room-moontear { top: 48%; left: 33%; width: 45px; animation: moontear-glow 3s infinite alternate ease-in-out; }
 
 @keyframes moontear-glow {
