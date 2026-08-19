@@ -1,4 +1,4 @@
-const CACHE_NAME = 'devililia-tarot-v7';
+const CACHE_NAME = 'devililia-tarot-v8';
 
 const urlsToCache = [
   './',
