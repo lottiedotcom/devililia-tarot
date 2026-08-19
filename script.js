@@ -302,29 +302,45 @@ function spawnMote() {
   mote.style.top = `${startY}px`;
 
   let holdTimer;
+  let isHolding = false;
+  let touchMoved = false;
 
-  mote.addEventListener('pointerdown', (e) => {
+  const startInteraction = (e) => {
     e.stopPropagation();
     if(isCheckpointActive || isChimeActive) return;
+    isHolding = false;
+    touchMoved = false;
 
     if (isTrapped) {
       mote.classList.add('holding');
       holdTimer = setTimeout(() => {
+        isHolding = true;
         burstMote(e, mote, true); 
       }, 500); 
     } else {
       burstMote(e, mote, false); 
     }
-  });
+  };
 
-  const cancelHold = () => {
+  const cancelInteraction = () => {
     clearTimeout(holdTimer);
     mote.classList.remove('holding');
   };
-  
-  mote.addEventListener('pointerup', cancelHold);
-  mote.addEventListener('pointerleave', cancelHold);
-  mote.addEventListener('pointercancel', cancelHold);
+
+  const endInteraction = (e) => {
+    clearTimeout(holdTimer);
+    mote.classList.remove('holding');
+    if (e.cancelable && e.type === 'touchend') e.preventDefault();
+  };
+
+  mote.addEventListener('touchstart', startInteraction, { passive: true });
+  mote.addEventListener('touchmove', () => { touchMoved = true; cancelInteraction(); }, { passive: true });
+  mote.addEventListener('touchend', endInteraction);
+  mote.addEventListener('touchcancel', cancelInteraction);
+
+  mote.addEventListener('mousedown', startInteraction);
+  mote.addEventListener('mouseleave', cancelInteraction);
+  mote.addEventListener('mouseup', endInteraction);
 
   moteContainer.appendChild(mote);
   void mote.offsetWidth;
@@ -342,15 +358,18 @@ function burstMote(e, mote, wasTrapped) {
   const baseGain = Math.max(2, Math.floor(echoesPerSecond * 0.5) + 2);
   const totalGain = wasTrapped ? baseGain * 4 : baseGain; 
   
+  let clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : window.innerWidth / 2);
+  let clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : window.innerHeight / 2);
+  
   addEchoes(totalGain);
   increaseDrift();
   if (wasTrapped) increaseDrift(); 
   
-  createRipple(e.clientX, e.clientY);
+  createRipple(clientX, clientY);
   
   const thoughtsArray = wasTrapped ? trappedThoughts : moteThoughts;
   const thought = thoughtsArray[Math.floor(Math.random() * thoughtsArray.length)];
-  spawnFloatingText(e.clientX, e.clientY, thought);
+  spawnFloatingText(clientX, clientY, thought);
   
   mote.remove();
 }
@@ -489,54 +508,65 @@ function showLore(itemId, imageSrc) {
   const snippets = loreData[itemId];
   const randomSnippet = snippets[Math.floor(Math.random() * snippets.length)];
   
-  // Set the image and text in the popup
   loreImage.src = imageSrc;
   loreText.innerText = randomSnippet;
   loreOverlay.classList.remove('hidden');
 }
 
-// Close Lore overlay via explicit close button
 loreCloseBtn.addEventListener('click', () => {
   loreOverlay.classList.add('hidden');
 });
 
-// CRITICAL FIX: The logic perfectly mirroring the trapped motes.
+// CRITICAL FIX: Robust touch and mouse logic for Hold-to-Inspect
 function setupRoomItem(elementId, loreKey, tapCallback) {
   const el = document.getElementById(elementId);
+  if (!el) return;
+
   let holdTimer;
   let isHolding = false;
+  let touchMoved = false;
 
-  el.addEventListener('contextmenu', (e) => {
-    e.preventDefault();
-  });
+  el.addEventListener('contextmenu', (e) => e.preventDefault());
 
-  el.addEventListener('pointerdown', (e) => {
-    e.stopPropagation();
+  const startInteraction = (e) => {
     if (isCheckpointActive || isChimeActive) return;
     isHolding = false;
+    touchMoved = false;
     
-    // Hold for 500ms to open lore
+    // Hold for 400ms to open lore (faster and more responsive)
     holdTimer = setTimeout(() => {
       isHolding = true;
       showLore(loreKey, el.src); 
-    }, 500); 
-  });
+    }, 400); 
+  };
 
-  const cancelHold = () => {
+  const cancelInteraction = () => {
     clearTimeout(holdTimer);
   };
 
-  el.addEventListener('pointerup', (e) => {
+  const endInteraction = (e) => {
     clearTimeout(holdTimer);
-    if (!isHolding && tapCallback) {
-      tapCallback(e); // Quick tap triggers action
-    }
-    // Tiny delay resetting isHolding prevents ghost taps
-    setTimeout(() => { isHolding = false; }, 50); 
-  });
+    
+    // Block mobile ghost clicks
+    if (e.cancelable && e.type === 'touchend') e.preventDefault();
 
-  el.addEventListener('pointerleave', cancelHold);
-  el.addEventListener('pointercancel', cancelHold);
+    if (!isHolding && !touchMoved && tapCallback) {
+      tapCallback(e); 
+    }
+    
+    setTimeout(() => { isHolding = false; }, 50); 
+  };
+
+  // NATIVE TOUCH (Mobile Fix)
+  el.addEventListener('touchstart', startInteraction, { passive: true });
+  el.addEventListener('touchmove', () => { touchMoved = true; cancelInteraction(); }, { passive: true });
+  el.addEventListener('touchend', endInteraction);
+  el.addEventListener('touchcancel', cancelInteraction);
+
+  // MOUSE EVENTS (Desktop Fallback)
+  el.addEventListener('mousedown', startInteraction);
+  el.addEventListener('mouseleave', cancelInteraction);
+  el.addEventListener('mouseup', endInteraction);
 }
 
 // --- INTERACTIVE ROOM ITEMS SETUP ---
@@ -613,7 +643,6 @@ setupRoomItem('room-polaroid', 'polaroid', null);
 setupRoomItem('room-moontear', 'moontear', null);
 setupRoomItem('room-clock', 'clock', null);
 setupRoomItem('room-pillow', 'pillow', null);
-
 
 setInterval(() => {
   if (echoesPerSecond > 0 && !isCheckpointActive && !isChimeActive) {
