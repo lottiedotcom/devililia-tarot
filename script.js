@@ -277,7 +277,8 @@ function buyShopItem(index) {
   if (echoes >= item.cost) {
     echoes -= item.cost;
     item.count += 1;
-    item.cost = Math.floor(item.cost * 1.18);
+    // NEW: Multiply the cost by 1.23 (Adds 23% to the price every purchase)
+    item.cost = Math.floor(item.cost * 1.23);
     calculateEchoRate();
     updateUI();
   }
@@ -389,6 +390,10 @@ function startTeaTimer(cp) {
     if (isMusicPlaying) {
       gameplayAudio.play().catch(() => {});
     }
+
+    // NEW: Grant 50 Echoes for taking the time to rest
+    addEchoes(50);
+    spawnFloatingText(window.innerWidth / 2, window.innerHeight / 2, "+50 Echoes (Rested)");
 
     closeCheckpoint(cp);
   }, 15000);
