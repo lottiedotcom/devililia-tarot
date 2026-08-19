@@ -23,6 +23,9 @@ const dialogueChoices = document.getElementById('dialogue-choices');
 const teaTimerOverlay = document.getElementById('tea-timer-overlay');
 const teaBarFill = document.getElementById('tea-bar-fill');
 
+// NEW: Music Toggle Button Reference
+const musicToggleBtn = document.getElementById('music-toggle-btn');
+
 // --- AUDIO SETUP ---
 const cardFlipAudio = new Audio('assets/cardflip.mp3');
 
@@ -37,16 +40,19 @@ const tarotAudio = new Audio('assets/tarotgameplay.mp3');
 tarotAudio.loop = true;
 tarotAudio.volume = 0.5;
 
-// --- AUDIO AUTOPLAY FIX ---
-let isAudioStarted = false;
-function initAudio() {
-  if (!isAudioStarted) {
-    gameplayAudio.play().catch(e => console.log("Waiting for user interaction..."));
-    isAudioStarted = true;
+// --- NEW MUSIC TOGGLE LOGIC ---
+let isMusicPlaying = false;
+
+musicToggleBtn.addEventListener('click', () => {
+  if (isMusicPlaying) {
+    gameplayAudio.pause();
+    musicToggleBtn.innerText = '🔇';
+    isMusicPlaying = false;
+  } else {
+    gameplayAudio.play().catch(e => console.log(e));
+    musicToggleBtn.innerText = '🔊';
+    isMusicPlaying = true;
   }
-}
-['pointerdown', 'touchstart', 'click'].forEach(evt => {
-  document.addEventListener(evt, initAudio, { once: true });
 });
 
 // --- RECURRING TEA TIME LOGIC ---
@@ -365,6 +371,7 @@ function startTeaTimer(cp) {
   teaTimerOverlay.classList.remove('hidden');
   teaBarFill.style.width = '0%';
   
+  // Pause gameplay audio, play tea timer audio
   gameplayAudio.pause();
   teatimerAudio.currentTime = 0;
   teatimerAudio.play().catch(() => {});
@@ -377,8 +384,9 @@ function startTeaTimer(cp) {
   setTimeout(() => {
     teaTimerOverlay.classList.add('hidden');
     
+    // Turn off tea music, ONLY resume background music if the toggle button is ON (🔊)
     teatimerAudio.pause();
-    if (isAudioStarted) {
+    if (isMusicPlaying) {
       gameplayAudio.play().catch(() => {});
     }
 
@@ -393,6 +401,7 @@ const card2Front = document.getElementById('card-2-front');
 const card3Front = document.getElementById('card-3-front');
 
 btnTarot.addEventListener('click', () => {
+  // Turn off all other audio, and ALWAYS play the finale tarot music
   gameplayAudio.pause();
   teatimerAudio.pause();
   tarotAudio.currentTime = 0;
@@ -445,3 +454,4 @@ document.querySelectorAll('.tarot-card').forEach(card => {
 calculateEchoRate();
 renderShop();
 updateUI();
+
