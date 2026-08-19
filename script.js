@@ -14,7 +14,6 @@ const driftBarFill = document.getElementById('drift-bar-fill');
 const shopItemsContainer = document.getElementById('shop-items');
 const btnTarot = document.getElementById('btn-tarot-reading');
 
-// --- NEW MOBILE SHOP TOGGLE VARIABLES ---
 const shopToggleBtn = document.getElementById('shop-toggle-btn');
 const shopContainer = document.getElementById('shop-container');
 
@@ -24,11 +23,29 @@ const dialogueChoices = document.getElementById('dialogue-choices');
 const teaTimerOverlay = document.getElementById('tea-timer-overlay');
 const teaBarFill = document.getElementById('tea-bar-fill');
 
+// --- AUDIO ENGINE ---
 const cardFlipAudio = new Audio('assets/cardflip.mp3');
+
 const gameplayAudio = new Audio('assets/gameplay.mp3');
+gameplayAudio.loop = true;
+gameplayAudio.volume = 0.5;
+
 const teatimerAudio = new Audio('assets/teatimer.mp3');
+teatimerAudio.volume = 0.6;
+
 const tarotAudio = new Audio('assets/Tarotgameplay.mp3');
 tarotAudio.loop = true;
+tarotAudio.volume = 0.5;
+
+// Start background music on the very first screen tap
+let isAudioStarted = false;
+document.addEventListener('pointerdown', () => {
+  if (!isAudioStarted) {
+    gameplayAudio.play().catch(() => {});
+    isAudioStarted = true;
+  }
+}, { once: true });
+
 
 const checkpoints = [
   {
@@ -104,7 +121,6 @@ const moteThoughts = [
   "Forgotten name", "Is this real?", "Fading out", "Whose voice?", "Keep walking"
 ];
 
-// --- MOBILE SHOP TOGGLE LOGIC ---
 shopToggleBtn.addEventListener('click', () => {
   shopContainer.classList.toggle('open');
   if (shopContainer.classList.contains('open')) {
@@ -135,7 +151,6 @@ crystalOrb.addEventListener('click', (e) => {
   addEchoes(1);
   increaseDrift();
   triggerOrbJump();
-  playRapidAudio(gameplayAudio, 0.4);
   createRipple(e.clientX, e.clientY);
 });
 
@@ -162,7 +177,6 @@ function spawnMote() {
     addEchoes(gain);
     increaseDrift();
     increaseDrift(); 
-    playRapidAudio(gameplayAudio, 0.5);
     createRipple(e.clientX, e.clientY);
     
     const thought = moteThoughts[Math.floor(Math.random() * moteThoughts.length)];
@@ -323,6 +337,11 @@ function startTeaTimer(cp) {
   teaTimerOverlay.classList.remove('hidden');
   teaBarFill.style.width = '0%';
   
+  // Audio Swap: Pause background, start tea music immediately
+  gameplayAudio.pause();
+  teatimerAudio.currentTime = 0;
+  teatimerAudio.play().catch(() => {});
+  
   void teaBarFill.offsetWidth; 
   
   teaBarFill.style.transition = 'width 15s linear';
@@ -330,7 +349,13 @@ function startTeaTimer(cp) {
 
   setTimeout(() => {
     teaTimerOverlay.classList.add('hidden');
-    teatimerAudio.play().catch(() => {});
+    
+    // Audio Swap: Stop tea timer, resume background
+    teatimerAudio.pause();
+    if (isAudioStarted) {
+      gameplayAudio.play().catch(() => {});
+    }
+
     closeCheckpoint(cp);
   }, 15000);
 }
@@ -342,11 +367,12 @@ const card2Front = document.getElementById('card-2-front');
 const card3Front = document.getElementById('card-3-front');
 
 btnTarot.addEventListener('click', () => {
+  // Final Audio Swap: Stop gameplay, start eerie tarot song
   gameplayAudio.pause();
-  tarotAudio.volume = 0.5;
+  teatimerAudio.pause();
+  tarotAudio.currentTime = 0;
   tarotAudio.play().catch(() => {});
 
-  // Hide everything including the new shop toggle button
   document.getElementById('ui-layer').classList.add('hidden');
   document.getElementById('mote-container').classList.add('hidden');
   document.getElementById('desk-layer').classList.add('hidden');
