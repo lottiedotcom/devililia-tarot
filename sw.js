@@ -1,4 +1,4 @@
-const CACHE_NAME = 'devililia-tarot-v5';
+const CACHE_NAME = 'devililia-tarot-v7';
 
 const urlsToCache = [
   './',
@@ -23,15 +23,27 @@ const urlsToCache = [
   './assets/item-clock.png',
   './assets/item-mirror.png',
   './assets/item-pillow.png',
+  './assets/mirrorgirl.png',
+  './assets/mirrorpool.png',
+  './assets/mirrorhall.png',
+  './assets/mirrorchurch.png',
+  './assets/tvon.png',
+  './assets/tvch1.png',
   './assets/gameplay.mp3',
   './assets/cardflip.mp3',
   './assets/teatimer.mp3',
   './assets/tarotgameplay.mp3',
   './assets/chime.mp3',        
+  './assets/tvon.mp3',        
+  './assets/tvch1.mp3',        
+  './assets/tvdefaulton.mp3',        
+  './assets/tvdefaultoff.mp3',        
   './assets/clockbg.png'   
 ];
 
 self.addEventListener('install', event => {
+  self.skipWaiting();
+  
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
@@ -60,6 +72,8 @@ self.addEventListener('activate', event => {
           }
         })
       );
+    }).then(() => {
+      return self.clients.claim();
     })
   );
 });
