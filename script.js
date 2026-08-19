@@ -2,10 +2,12 @@ let echoes = 0;
 let echoesPerSecond = 0;
 let liminalDrift = 0; 
 let isCheckpointActive = false;
+let isChimeActive = false; 
 
 let paths = { threshold: 0, attachment: 0, void: 0 };
 
 const backgroundLayer = document.getElementById('background-layer');
+const deskLayer = document.getElementById('desk-layer');
 const moteContainer = document.getElementById('mote-container');
 const crystalOrb = document.getElementById('crystal-orb');
 const echoCountDisplay = document.getElementById('echo-count');
@@ -23,24 +25,38 @@ const dialogueChoices = document.getElementById('dialogue-choices');
 const teaTimerOverlay = document.getElementById('tea-timer-overlay');
 const teaBarFill = document.getElementById('tea-bar-fill');
 
-// NEW: Music Toggle Button Reference
 const musicToggleBtn = document.getElementById('music-toggle-btn');
+
+// NEW CLOCK EVENT REFERENCES
+const chimeOverlay = document.getElementById('chime-overlay');
+const chimeTimerDisplay = document.getElementById('chime-timer');
+const chimeParticlesContainer = document.getElementById('chime-particles');
+let chimeCountdownInterval;
 
 // --- AUDIO SETUP ---
 const cardFlipAudio = new Audio('assets/cardflip.mp3');
 
 const gameplayAudio = new Audio('assets/gameplay.mp3');
-gameplayAudio.loop = true;
 gameplayAudio.volume = 0.5;
 
 const teatimerAudio = new Audio('assets/teatimer.mp3');
 teatimerAudio.volume = 0.6;
 
 const tarotAudio = new Audio('assets/tarotgameplay.mp3');
-tarotAudio.loop = true;
 tarotAudio.volume = 0.5;
 
-// --- NEW MUSIC TOGGLE LOGIC ---
+const chimeAudio = new Audio('assets/chime.mp3');
+chimeAudio.volume = 0.9;
+
+// --- AUDIO LOOPING ---
+[gameplayAudio, tarotAudio].forEach(audio => {
+  audio.addEventListener('ended', function() {
+    this.currentTime = 0;
+    this.play().catch(e => console.log(e));
+  }, false);
+});
+
+// --- MUSIC TOGGLE LOGIC ---
 let isMusicPlaying = false;
 
 musicToggleBtn.addEventListener('click', () => {
@@ -54,6 +70,69 @@ musicToggleBtn.addEventListener('click', () => {
     isMusicPlaying = true;
   }
 });
+
+// --- HOURLY CHIME LOGIC WITH COUNTDOWN ---
+function checkHourlyChime() {
+  const now = new Date();
+  if (now.getMinutes() === 0 && now.getSeconds() === 0 && !isChimeActive) {
+    triggerHourlyChime();
+  }
+}
+setInterval(checkHourlyChime, 1000); 
+
+function triggerHourlyChime() {
+  isChimeActive = true;
+  
+  backgroundLayer.classList.add('hourly-blur');
+  deskLayer.classList.add('hourly-blur');
+  moteContainer.classList.add('hourly-blur');
+
+  chimeOverlay.classList.remove('hidden');
+
+  if (isMusicPlaying) gameplayAudio.pause();
+  chimeAudio.currentTime = 0;
+  chimeAudio.play().catch(()=>{});
+
+  // Generate cute floating dust particles
+  chimeParticlesContainer.innerHTML = '';
+  for(let i=0; i<25; i++) {
+    let sparkle = document.createElement('div');
+    sparkle.className = 'chime-sparkle';
+    sparkle.style.left = Math.random() * 100 + '%';
+    sparkle.style.animationDelay = (Math.random() * 2) + 's';
+    sparkle.style.animationDuration = (2 + Math.random() * 2) + 's';
+    chimeParticlesContainer.appendChild(sparkle);
+  }
+
+  // 10 Second Countdown Timer
+  let timeLeft = 10;
+  chimeTimerDisplay.innerText = timeLeft;
+  
+  clearInterval(chimeCountdownInterval);
+  chimeCountdownInterval = setInterval(() => {
+    timeLeft--;
+    if(timeLeft > 0) {
+      chimeTimerDisplay.innerText = timeLeft;
+    } else {
+      chimeTimerDisplay.innerText = 0;
+    }
+  }, 1000);
+
+  // Restore everything after 10 seconds
+  setTimeout(() => {
+    clearInterval(chimeCountdownInterval);
+    chimeOverlay.classList.add('hidden');
+    backgroundLayer.classList.remove('hourly-blur');
+    deskLayer.classList.remove('hourly-blur');
+    moteContainer.classList.remove('hourly-blur');
+    
+    if (isMusicPlaying) {
+      gameplayAudio.play().catch(()=>{});
+    }
+    
+    isChimeActive = false;
+  }, 10000); 
+}
 
 // --- RECURRING TEA TIME LOGIC ---
 let firstTeaTriggered = false;
@@ -76,8 +155,8 @@ function triggerTeaTime() {
 function startTeaTimerInterval() {
   clearInterval(teaInterval);
   teaInterval = setInterval(() => {
-    if (!isCheckpointActive) triggerTeaTime();
-  }, 15 * 60 * 1000); // 15 minutes
+    if (!isCheckpointActive && !isChimeActive) triggerTeaTime();
+  }, 15 * 60 * 1000); 
 }
 startTeaTimerInterval();
 
@@ -147,13 +226,13 @@ const moteThoughts = [
   "Forgotten name", "Is this real?", "Fading out", "Whose voice?", "Keep walking"
 ];
 
+const trappedThoughts = [
+  "It remembers you", "Don't let go", "Heavy fragment", "Hold still..."
+];
+
 shopToggleBtn.addEventListener('click', () => {
   shopContainer.classList.toggle('open');
-  if (shopContainer.classList.contains('open')) {
-    shopToggleBtn.innerText = 'Close Machine';
-  } else {
-    shopToggleBtn.innerText = 'Open Machine';
-  }
+  shopToggleBtn.innerText = shopContainer.classList.contains('open') ? 'Close Machine' : 'Open Machine';
 });
 
 function updateTimeOfDay() {
@@ -173,7 +252,7 @@ function increaseDrift() {
 }
 
 crystalOrb.addEventListener('click', (e) => {
-  if(isCheckpointActive) return;
+  if(isCheckpointActive || isChimeActive) return;
   addEchoes(1);
   increaseDrift();
   triggerOrbJump();
@@ -187,32 +266,65 @@ function triggerOrbJump() {
 }
 
 function spawnMote() {
-  if(isCheckpointActive) return;
+  if(isCheckpointActive || isChimeActive) return;
 
   const mote = document.createElement('img');
   mote.src = 'assets/mote.png';
   mote.className = 'floating-mote';
+  
+  const isTrapped = Math.random() < 0.15;
+  if (isTrapped) mote.classList.add('trapped-mote');
+
   const x = Math.random() * (window.innerWidth - 60) + 30;
   const y = Math.random() * (window.innerHeight * 0.45) + 60;
   mote.style.left = `${x}px`;
   mote.style.top = `${y}px`;
 
-  mote.addEventListener('click', (e) => {
+  let holdTimer;
+
+  mote.addEventListener('pointerdown', (e) => {
     e.stopPropagation();
-    const gain = Math.max(2, Math.floor(echoesPerSecond * 0.5) + 2);
-    addEchoes(gain);
-    increaseDrift();
-    increaseDrift(); 
-    createRipple(e.clientX, e.clientY);
-    
-    const thought = moteThoughts[Math.floor(Math.random() * moteThoughts.length)];
-    spawnFloatingText(e.clientX, e.clientY, `${thought}`);
-    mote.remove();
+    if(isCheckpointActive || isChimeActive) return;
+
+    if (isTrapped) {
+      mote.classList.add('holding');
+      holdTimer = setTimeout(() => {
+        burstMote(e, mote, true); 
+      }, 1000);
+    } else {
+      burstMote(e, mote, false); 
+    }
   });
 
+  const cancelHold = () => {
+    clearTimeout(holdTimer);
+    mote.classList.remove('holding');
+  };
+  mote.addEventListener('pointerup', cancelHold);
+  mote.addEventListener('pointerleave', cancelHold);
+  mote.addEventListener('pointercancel', cancelHold);
+
   moteContainer.appendChild(mote);
-  setTimeout(() => { if (mote.parentNode) mote.remove(); }, 10000);
+  setTimeout(() => { if (mote.parentNode) mote.remove(); }, 12000);
 }
+
+function burstMote(e, mote, wasTrapped) {
+  const baseGain = Math.max(2, Math.floor(echoesPerSecond * 0.5) + 2);
+  const totalGain = wasTrapped ? baseGain * 4 : baseGain; 
+  
+  addEchoes(totalGain);
+  increaseDrift();
+  if (wasTrapped) increaseDrift(); 
+  
+  createRipple(e.clientX, e.clientY);
+  
+  const thoughtsArray = wasTrapped ? trappedThoughts : moteThoughts;
+  const thought = thoughtsArray[Math.floor(Math.random() * thoughtsArray.length)];
+  spawnFloatingText(e.clientX, e.clientY, thought);
+  
+  mote.remove();
+}
+
 setInterval(spawnMote, 4500);
 
 function createRipple(x, y) {
@@ -272,12 +384,11 @@ function renderShop() {
 }
 
 function buyShopItem(index) {
-  if (isCheckpointActive) return;
+  if (isCheckpointActive || isChimeActive) return;
   const item = shopItems[index];
   if (echoes >= item.cost) {
     echoes -= item.cost;
     item.count += 1;
-    // NEW: Multiply the cost by 1.23 (Adds 23% to the price every purchase)
     item.cost = Math.floor(item.cost * 1.23);
     calculateEchoRate();
     updateUI();
@@ -285,7 +396,7 @@ function buyShopItem(index) {
 }
 
 setInterval(() => {
-  if (echoesPerSecond > 0 && !isCheckpointActive) {
+  if (echoesPerSecond > 0 && !isCheckpointActive && !isChimeActive) {
     echoes += echoesPerSecond / 10;
     updateUI();
 
@@ -372,7 +483,6 @@ function startTeaTimer(cp) {
   teaTimerOverlay.classList.remove('hidden');
   teaBarFill.style.width = '0%';
   
-  // Pause gameplay audio, play tea timer audio
   gameplayAudio.pause();
   teatimerAudio.currentTime = 0;
   teatimerAudio.play().catch(() => {});
@@ -385,13 +495,11 @@ function startTeaTimer(cp) {
   setTimeout(() => {
     teaTimerOverlay.classList.add('hidden');
     
-    // Turn off tea music, ONLY resume background music if the toggle button is ON (🔊)
     teatimerAudio.pause();
     if (isMusicPlaying) {
       gameplayAudio.play().catch(() => {});
     }
 
-    // NEW: Grant 50 Echoes for taking the time to rest
     addEchoes(50);
     spawnFloatingText(window.innerWidth / 2, window.innerHeight / 2, "+50 Echoes (Rested)");
 
@@ -406,7 +514,6 @@ const card2Front = document.getElementById('card-2-front');
 const card3Front = document.getElementById('card-3-front');
 
 btnTarot.addEventListener('click', () => {
-  // Turn off all other audio, and ALWAYS play the finale tarot music
   gameplayAudio.pause();
   teatimerAudio.pause();
   tarotAudio.currentTime = 0;
@@ -450,7 +557,7 @@ function generateTarotReading() {
 document.querySelectorAll('.tarot-card').forEach(card => {
   card.addEventListener('click', () => {
     if (!card.classList.contains('flipped')) {
-      playRapidAudio(cardFlipAudio, 0.6);
+      cardFlipAudio.cloneNode().play().catch(()=>{});
       card.classList.add('flipped');
     }
   });
