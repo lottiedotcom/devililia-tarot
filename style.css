@@ -33,7 +33,7 @@ body, html {
   left: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none;
+  pointer-events: none; /* Default lets clicks pass through */
 }
 
 .hidden {
@@ -72,12 +72,13 @@ body, html {
   overflow: hidden;
 }
 
+/* BIG ORB ON THE RIGHT */
 #crystal-orb {
   position: absolute;
   bottom: 27%;
-  left: 72%; 
+  left: 77%; 
   transform: translateX(-50%);
-  width: 110px; 
+  width: 155px; 
   cursor: pointer;
   z-index: 6;
   pointer-events: auto;
@@ -106,6 +107,23 @@ body, html {
   0% { transform: translateY(0px) rotate(0deg); }
   50% { transform: translateY(-12px) rotate(15deg); }
   100% { transform: translateY(6px) rotate(-15deg); }
+}
+
+/* THE TRAPPED MOTE EFFECTS */
+.trapped-mote {
+  filter: hue-rotate(270deg) drop-shadow(0 0 8px rgba(142, 85, 114, 0.8));
+  animation: trapped-shake 0.3s infinite alternate !important;
+}
+
+@keyframes trapped-shake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  100% { transform: translate(-1px, -2px) rotate(-3deg); }
+}
+
+.trapped-mote.holding {
+  transform: scale(0.7) !important;
+  filter: hue-rotate(270deg) brightness(1.5) drop-shadow(0 0 15px rgba(255, 203, 242, 1));
+  transition: all 0.5s ease-in;
 }
 
 .ripple {
@@ -143,12 +161,12 @@ body, html {
   100% { transform: translate(-50%, -45px); opacity: 0; }
 }
 
+/* UI LAYER */
 #ui-layer {
   z-index: 10;
-  pointer-events: none;
+  pointer-events: none; 
 }
 
-/* NEW MUSIC BUTTON STYLING */
 #music-toggle-btn {
   position: absolute;
   top: 15px;
@@ -177,7 +195,7 @@ body, html {
 
 #top-hud {
   position: absolute;
-  top: 15px;
+  top: 15px; 
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -185,7 +203,7 @@ body, html {
   gap: 10px;
   align-items: center;
   pointer-events: auto;
-  padding: 0 60px; /* Keeps it from overlapping the new button */
+  padding: 0 60px; /* Keeps it from overlapping the music button */
 }
 
 #drift-container {
@@ -486,5 +504,66 @@ body, html {
   font-weight: bold;
   font-size: 12px;
   border: 2px solid var(--soft-pink);
+}
+
+/* --- THE HOURLY BACKGROUND BLUR EFFECT --- */
+.hourly-blur {
+  filter: blur(6px) brightness(0.6) saturate(0.8);
+  transition: filter 1.5s ease-in-out;
+  pointer-events: none;
+}
+
+/* --- HOURLY CLOCK EVENT & COUNTDOWN --- */
+#chime-overlay {
+  z-index: 40; 
+  background-image: url('assets/clockbg.png');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto; 
+  transition: opacity 1s ease-in-out;
+}
+
+#chime-timer {
+  font-size: 90px;
+  color: var(--soft-pink);
+  text-shadow: 0 0 15px var(--plum-dark), 0 0 30px var(--light-blue);
+  font-weight: bold;
+  z-index: 42;
+  font-family: inherit;
+  animation: pulse-timer 1s infinite alternate;
+}
+
+@keyframes pulse-timer {
+  0% { transform: scale(1); opacity: 0.85; }
+  100% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 25px var(--soft-pink), 0 0 40px var(--light-blue); }
+}
+
+#chime-particles {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 41;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.chime-sparkle {
+  position: absolute;
+  width: 12px; height: 12px;
+  background-color: var(--soft-pink);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--light-blue);
+  animation: float-up 3s linear infinite;
+  opacity: 0;
+}
+
+@keyframes float-up {
+  0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+  20% { opacity: 0.7; }
+  80% { opacity: 0.7; }
+  100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
 }
 
