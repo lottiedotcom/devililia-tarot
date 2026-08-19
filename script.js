@@ -27,7 +27,6 @@ const teaBarFill = document.getElementById('tea-bar-fill');
 
 const musicToggleBtn = document.getElementById('music-toggle-btn');
 
-// NEW CLOCK EVENT REFERENCES
 const chimeOverlay = document.getElementById('chime-overlay');
 const chimeTimerDisplay = document.getElementById('chime-timer');
 const chimeParticlesContainer = document.getElementById('chime-particles');
@@ -93,7 +92,6 @@ function triggerHourlyChime() {
   chimeAudio.currentTime = 0;
   chimeAudio.play().catch(()=>{});
 
-  // Generate cute floating dust particles
   chimeParticlesContainer.innerHTML = '';
   for(let i=0; i<25; i++) {
     let sparkle = document.createElement('div');
@@ -104,7 +102,6 @@ function triggerHourlyChime() {
     chimeParticlesContainer.appendChild(sparkle);
   }
 
-  // 10 Second Countdown Timer
   let timeLeft = 10;
   chimeTimerDisplay.innerText = timeLeft;
   
@@ -118,7 +115,6 @@ function triggerHourlyChime() {
     }
   }, 1000);
 
-  // Restore everything after 10 seconds
   setTimeout(() => {
     clearInterval(chimeCountdownInterval);
     chimeOverlay.classList.add('hidden');
@@ -271,11 +267,12 @@ function spawnMote() {
   const mote = document.createElement('img');
   mote.src = 'assets/mote.png';
   mote.className = 'floating-mote';
+  mote.draggable = false; 
   
   const isTrapped = Math.random() < 0.15;
   if (isTrapped) mote.classList.add('trapped-mote');
 
-  const x = Math.random() * (window.innerWidth - 60) + 30;
+  const x = Math.random() * (window.innerWidth - 90) + 30; 
   const y = Math.random() * (window.innerHeight * 0.45) + 60;
   mote.style.left = `${x}px`;
   mote.style.top = `${y}px`;
@@ -290,7 +287,7 @@ function spawnMote() {
       mote.classList.add('holding');
       holdTimer = setTimeout(() => {
         burstMote(e, mote, true); 
-      }, 1000);
+      }, 500); 
     } else {
       burstMote(e, mote, false); 
     }
@@ -300,6 +297,7 @@ function spawnMote() {
     clearTimeout(holdTimer);
     mote.classList.remove('holding');
   };
+  
   mote.addEventListener('pointerup', cancelHold);
   mote.addEventListener('pointerleave', cancelHold);
   mote.addEventListener('pointercancel', cancelHold);
