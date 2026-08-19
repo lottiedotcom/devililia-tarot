@@ -1,18 +1,10 @@
-// --- STATE MANAGEMENT ---
 let echoes = 0;
 let echoesPerSecond = 0;
-let totalInteractions = 0; // Tracks clicks to fill drift
-let liminalDrift = 0; // 0 to 100
+let liminalDrift = 0; 
 let isCheckpointActive = false;
 
-// --- PSYCHOLOGICAL PATH TRACKING ---
-let paths = {
-  threshold: 0,
-  attachment: 0,
-  void: 0
-};
+let paths = { threshold: 0, attachment: 0, void: 0 };
 
-// --- DOM REFERENCES ---
 const backgroundLayer = document.getElementById('background-layer');
 const moteContainer = document.getElementById('mote-container');
 const crystalOrb = document.getElementById('crystal-orb');
@@ -30,9 +22,10 @@ const teaBarFill = document.getElementById('tea-bar-fill');
 
 const cardFlipAudio = new Audio('assets/cardflip.mp3');
 const gameplayAudio = new Audio('assets/gameplay.mp3');
-// Optional audio: const teaChime = new Audio('assets/teatimer.mp3');
+const teatimerAudio = new Audio('assets/teatimer.mp3');
+const tarotAudio = new Audio('assets/Tarotgameplay.mp3');
+tarotAudio.loop = true;
 
-// --- THE CHECKPOINTS DATA ---
 const checkpoints = [
   {
     trigger: 15,
@@ -91,7 +84,6 @@ const checkpoints = [
   }
 ];
 
-// --- SHOP UPGRADES ---
 const shopItems = [
   { id: 'hourglass', name: 'Hourglass Shard', cost: 15, income: 1, count: 0, icon: 'assets/item-hourglass.png' },
   { id: 'polaroid', name: 'Fading Polaroid', cost: 75, income: 3, count: 0, icon: 'assets/item-polaroid.png' },
@@ -103,13 +95,11 @@ const shopItems = [
   { id: 'pillow', name: 'Ghost Cat Pillow', cost: 85000, income: 1200, count: 0, icon: 'assets/item-pillow.png' }
 ];
 
-// --- MOTES & THOUGHTS ---
 const moteThoughts = [
   "Nobody's home", "You left it open", "Inside your skin", "Not your face", 
   "Forgotten name", "Is this real?", "Fading out", "Whose voice?", "Keep walking"
 ];
 
-// --- CORE FUNCTIONS ---
 function updateTimeOfDay() {
   const currentHour = new Date().getHours();
   const isDay = currentHour >= 6 && currentHour < 18;
@@ -120,11 +110,8 @@ setInterval(updateTimeOfDay, 60000);
 
 function increaseDrift() {
   if (isCheckpointActive || liminalDrift >= 100) return;
-  
-  // Slowly fills up. Adjust this math to make the game longer/shorter!
   liminalDrift += 0.5; 
   if (liminalDrift > 100) liminalDrift = 100;
-  
   driftBarFill.style.width = `${liminalDrift}%`;
   checkTriggers();
 }
@@ -160,7 +147,7 @@ function spawnMote() {
     const gain = Math.max(2, Math.floor(echoesPerSecond * 0.5) + 2);
     addEchoes(gain);
     increaseDrift();
-    increaseDrift(); // Motes give double drift progress!
+    increaseDrift(); 
     playRapidAudio(gameplayAudio, 0.5);
     createRipple(e.clientX, e.clientY);
     
@@ -174,7 +161,6 @@ function spawnMote() {
 }
 setInterval(spawnMote, 4500);
 
-// --- VISUAL FX ---
 function createRipple(x, y) {
   const ripple = document.createElement('div');
   ripple.className = 'ripple';
@@ -200,7 +186,6 @@ function playRapidAudio(audioObj, volume = 0.5) {
   sound.play().catch(() => {});
 }
 
-// --- ECONOMY ---
 function addEchoes(amount) {
   echoes += amount;
   updateUI();
@@ -253,10 +238,16 @@ setInterval(() => {
 
 function updateUI() {
   echoCountDisplay.innerText = Math.floor(echoes);
-  renderShop(); // Re-render to update states/costs visually
+  const shopElements = document.querySelectorAll('.shop-item');
+  shopElements.forEach((el, index) => {
+    if (echoes >= shopItems[index].cost) {
+      el.classList.remove('disabled');
+    } else {
+      el.classList.add('disabled');
+    }
+  });
 }
 
-// --- CHECKPOINT SYSTEM ---
 function checkTriggers() {
   const pending = checkpoints.find(cp => !cp.completed && liminalDrift >= cp.trigger);
   if (pending) {
@@ -281,18 +272,13 @@ function displayCheckpoint(cp) {
 }
 
 function handleChoice(choice, cp) {
-  // Add path points
-  if (choice.path) {
-    paths[choice.path] += 1;
-  }
+  if (choice.path) { paths[choice.path] += 1; }
 
-  // Handle Part 2 of Checkpoint 3
   if (choice.nextPart && cp.part2) {
     displayCheckpoint(cp.part2);
     return;
   }
 
-  // Handle immediate dialogue follow ups (like declining tea)
   if (choice.followUp) {
     dialogueText.innerText = choice.followUp;
     dialogueChoices.innerHTML = '';
@@ -300,7 +286,6 @@ function handleChoice(choice, cp) {
     return;
   }
 
-  // Handle special actions
   if (choice.action === "startTea") {
     dialogueOverlay.classList.add('hidden');
     startTeaTimer(cp);
@@ -317,70 +302,51 @@ function handleChoice(choice, cp) {
 function closeCheckpoint(cp) {
   if(cp) cp.completed = true;
   dialogueOverlay.classList.add('hidden');
-  setTimeout(() => { isCheckpointActive = false; }, 500); // Small delay to prevent accidental clicks
+  setTimeout(() => { isCheckpointActive = false; }, 500); 
 }
 
-// --- TEA TIMER ---
 function startTeaTimer(cp) {
   teaTimerOverlay.classList.remove('hidden');
   teaBarFill.style.width = '0%';
   
-  // Force reflow
   void teaBarFill.offsetWidth; 
   
-  // Animate CSS to 100% over 15 seconds
   teaBarFill.style.transition = 'width 15s linear';
   teaBarFill.style.width = '100%';
 
   setTimeout(() => {
     teaTimerOverlay.classList.add('hidden');
-    // if (typeof teaChime !== 'undefined') teaChime.play();
+    teatimerAudio.play().catch(() => {});
     closeCheckpoint(cp);
   }, 15000);
 }
 
-// --- INITIALIZE ---
-calculateEchoRate();
-updateUI();
-
-// --- THE TAROT FINALE ENGINE ---
-
-// Pre-load the tarot music
-const tarotAudio = new Audio('assets/Tarotgameplay.mp3');
-tarotAudio.loop = true;
-
+// --- TAROT LOGIC ---
 const tarotLayer = document.getElementById('tarot-layer');
 const card1Front = document.getElementById('card-1-front');
 const card2Front = document.getElementById('card-2-front');
 const card3Front = document.getElementById('card-3-front');
 
-// When the player clicks "Ask for the Reading"
 btnTarot.addEventListener('click', () => {
-  // 1. Swap Music
   gameplayAudio.pause();
   tarotAudio.volume = 0.5;
   tarotAudio.play().catch(() => {});
 
-  // 2. Hide the hallway and main UI, show the top-down tarot table
   document.getElementById('ui-layer').classList.add('hidden');
   document.getElementById('mote-container').classList.add('hidden');
   document.getElementById('desk-layer').classList.add('hidden');
   tarotLayer.classList.remove('hidden');
 
-  // 3. Calculate Dominant Path & Generate Reading
   generateTarotReading();
 });
 
 function generateTarotReading() {
-  // Find which path scored the highest
   let dominantPath = Object.keys(paths).reduce((a, b) => paths[a] > paths[b] ? a : b);
 
-  // Default weirdness twist for the cards
   let card1 = "The High Priestess\n\n(Drawn upside down near a flickering light. You know a secret, but it's about a room you haven't visited yet.)";
   let card2 = "The Tower\n\n(The wallpaper is peeling. Sudden chaos, or maybe just a realization that the ceiling was painted on.)";
   let card3 = "The Fool\n\n(Stepping off a ledge into a pile of static. A new beginning, completely untethered.)";
 
-  // Customize based on their psychological path
   if (dominantPath === "threshold") {
     card1 = "The Magician\n\n(You see the seams of this place. You manipulate the echoes well, but don't look too closely at the wiring.)";
     card2 = "The Hermit\n\n(Holding a lantern in an endless hall. You are aware, but awareness is a lonely road.)";
@@ -395,8 +361,20 @@ function generateTarotReading() {
     card3 = "The World\n\n(The hallway loops back on itself. Emptiness is complete. You belong to the corridor now.)";
   }
 
-  // Inject text into the front of the cards
   card1Front.innerText = card1;
   card2Front.innerText = card2;
   card3Front.innerText = card3;
 }
+
+document.querySelectorAll('.tarot-card').forEach(card => {
+  card.addEventListener('click', () => {
+    if (!card.classList.contains('flipped')) {
+      playRapidAudio(cardFlipAudio, 0.6);
+      card.classList.add('flipped');
+    }
+  });
+});
+
+calculateEchoRate();
+renderShop();
+updateUI();
