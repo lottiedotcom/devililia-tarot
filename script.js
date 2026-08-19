@@ -267,6 +267,9 @@ function increaseDrift() {
   checkTriggers();
 }
 
+// CRITICAL FIX: Block context menu on the Orb
+crystalOrb.addEventListener('contextmenu', (e) => e.preventDefault());
+
 crystalOrb.addEventListener('click', (e) => {
   if(isCheckpointActive || isChimeActive) return;
   addEchoes(1);
@@ -288,6 +291,9 @@ function spawnMote() {
   mote.src = 'assets/mote.png';
   mote.className = 'floating-mote';
   mote.draggable = false; 
+  
+  // CRITICAL FIX: Block context menu on floating motes
+  mote.addEventListener('contextmenu', (e) => e.preventDefault());
   
   const isTrapped = Math.random() < 0.15;
   if (isTrapped) mote.classList.add('trapped-mote');
@@ -488,7 +494,6 @@ function showLore(itemId) {
   loreOverlay.classList.remove('hidden');
 }
 
-// Close Lore overlay when tapped
 loreOverlay.addEventListener('click', () => {
   loreOverlay.classList.add('hidden');
 });
@@ -498,13 +503,18 @@ function setupRoomItem(elementId, loreKey, tapCallback) {
   let holdTimer;
   let isHolding = false;
 
+  // CRITICAL FIX: This absolutely obliterates the mobile browser's "save image" menu!
+  el.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+  });
+
   el.addEventListener('pointerdown', (e) => {
     if (isCheckpointActive || isChimeActive) return;
     isHolding = false;
     holdTimer = setTimeout(() => {
       isHolding = true;
       showLore(loreKey);
-    }, 500); // Hold for 500ms to open lore
+    }, 500); 
   });
 
   const cancelHold = () => {
@@ -514,7 +524,7 @@ function setupRoomItem(elementId, loreKey, tapCallback) {
   el.addEventListener('pointerup', (e) => {
     clearTimeout(holdTimer);
     if (!isHolding && tapCallback) {
-      tapCallback(e); // If it was a quick tap, run the action
+      tapCallback(e); 
     }
   });
 
@@ -524,7 +534,6 @@ function setupRoomItem(elementId, loreKey, tapCallback) {
 
 // --- INTERACTIVE ROOM ITEMS SETUP ---
 
-// 1. Mirror
 const roomMirror = document.getElementById('room-mirror');
 const mirrorReflections = [
   'assets/item-mirror.png',
@@ -548,7 +557,6 @@ setupRoomItem('room-mirror', 'mirror', () => {
   setTimeout(() => { roomMirror.src = mirrorReflections[0]; }, 4000);
 });
 
-// 2. Television 
 const roomTv = document.getElementById('room-tv');
 let tvState = 0; 
 
@@ -586,7 +594,6 @@ setupRoomItem('room-tv', 'tv', () => {
   }
 });
 
-// 3. Other items (Quick tap effects)
 setupRoomItem('room-letter', 'letter', () => {
   spawnFloatingText(document.getElementById('room-letter').getBoundingClientRect().left, document.getElementById('room-letter').getBoundingClientRect().top - 20, "Waiting...");
 });
@@ -595,7 +602,6 @@ setupRoomItem('room-hourglass', 'hourglass', () => {
   spawnFloatingText(document.getElementById('room-hourglass').getBoundingClientRect().left, document.getElementById('room-hourglass').getBoundingClientRect().top - 20, "Time slows.");
 });
 
-// Items without quick tap actions, just lore holds
 setupRoomItem('room-polaroid', 'polaroid', null);
 setupRoomItem('room-moontear', 'moontear', null);
 setupRoomItem('room-clock', 'clock', null);
