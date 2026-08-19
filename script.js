@@ -23,7 +23,7 @@ const dialogueChoices = document.getElementById('dialogue-choices');
 const teaTimerOverlay = document.getElementById('tea-timer-overlay');
 const teaBarFill = document.getElementById('tea-bar-fill');
 
-// --- AUDIO ENGINE ---
+// --- AUDIO SETUP ---
 const cardFlipAudio = new Audio('assets/cardflip.mp3');
 
 const gameplayAudio = new Audio('assets/gameplay.mp3');
@@ -33,18 +33,22 @@ gameplayAudio.volume = 0.5;
 const teatimerAudio = new Audio('assets/teatimer.mp3');
 teatimerAudio.volume = 0.6;
 
-const tarotAudio = new Audio('assets/Tarotgameplay.mp3');
+// FIXED: Lowercase filename to match your repo
+const tarotAudio = new Audio('assets/tarotgameplay.mp3');
 tarotAudio.loop = true;
 tarotAudio.volume = 0.5;
 
-// Start background music on the very first screen tap
+// FIXED AUDIO AUTOPLAY: Forces mobile browsers to allow the music
 let isAudioStarted = false;
-document.addEventListener('pointerdown', () => {
+function initAudio() {
   if (!isAudioStarted) {
-    gameplayAudio.play().catch(() => {});
+    gameplayAudio.play().catch(e => console.log("Audio waiting for stronger interaction"));
     isAudioStarted = true;
   }
-}, { once: true });
+}
+// Using both click and touchstart guarantees the music fires when the screen is tapped
+document.addEventListener('click', initAudio, { once: true });
+document.addEventListener('touchstart', initAudio, { once: true });
 
 
 const checkpoints = [
@@ -208,12 +212,6 @@ function spawnFloatingText(x, y, text) {
   setTimeout(() => label.remove(), 1800);
 }
 
-function playRapidAudio(audioObj, volume = 0.5) {
-  const sound = audioObj.cloneNode();
-  sound.volume = volume;
-  sound.play().catch(() => {});
-}
-
 function addEchoes(amount) {
   echoes += amount;
   updateUI();
@@ -337,7 +335,6 @@ function startTeaTimer(cp) {
   teaTimerOverlay.classList.remove('hidden');
   teaBarFill.style.width = '0%';
   
-  // Audio Swap: Pause background, start tea music immediately
   gameplayAudio.pause();
   teatimerAudio.currentTime = 0;
   teatimerAudio.play().catch(() => {});
@@ -350,7 +347,6 @@ function startTeaTimer(cp) {
   setTimeout(() => {
     teaTimerOverlay.classList.add('hidden');
     
-    // Audio Swap: Stop tea timer, resume background
     teatimerAudio.pause();
     if (isAudioStarted) {
       gameplayAudio.play().catch(() => {});
@@ -367,7 +363,6 @@ const card2Front = document.getElementById('card-2-front');
 const card3Front = document.getElementById('card-3-front');
 
 btnTarot.addEventListener('click', () => {
-  // Final Audio Swap: Stop gameplay, start eerie tarot song
   gameplayAudio.pause();
   teatimerAudio.pause();
   tarotAudio.currentTime = 0;
@@ -420,3 +415,4 @@ document.querySelectorAll('.tarot-card').forEach(card => {
 calculateEchoRate();
 renderShop();
 updateUI();
+
