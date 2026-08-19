@@ -55,13 +55,19 @@ body, html {
   pointer-events: auto;
 }
 
+/* CRITICAL: Strict rules to block the mobile magnifier and copy-paste menus */
+.room-item, .floating-mote, #crystal-orb {
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  touch-action: none;
+}
+
 .room-item {
   position: absolute;
   object-fit: contain;
   cursor: pointer;
   transition: transform 0.2s;
-  touch-action: none;
-  -webkit-touch-callout: none;
 }
 
 .room-item:active {
@@ -80,7 +86,6 @@ body, html {
   width: 55px;
 }
 
-/* ENLARGED POLAROID */
 #room-polaroid {
   top: 42%;
   right: 12%;
@@ -96,7 +101,6 @@ body, html {
   z-index: 4;
 }
 
-/* MOVED HOURGLASS TO LEFT DESK */
 #room-hourglass {
   bottom: 28%;
   left: 18%;
@@ -179,8 +183,6 @@ body, html {
   cursor: pointer;
   z-index: 7;
   pointer-events: auto;
-  touch-action: none;
-  -webkit-touch-callout: none;
   animation: mote-bob 4s ease-in-out infinite alternate;
   transition: left 12s linear, top 12s linear; 
 }
@@ -435,7 +437,7 @@ body, html {
 .item-count { font-size: 10px; color: var(--light-blue); }
 
 #dialogue-overlay, #lore-overlay {
-  z-index: 50; /* Above everything */
+  z-index: 50; 
   background-color: rgba(0, 0, 0, 0.8);
   display: flex;
   align-items: center;
