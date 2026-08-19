@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Corridor of Cups</title>
+    <title>devililias tarot</title>
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style.css">
+    <meta name="apple-mobile-web-app-title" content="devililias tarot">
 </head>
 <body>
 
@@ -17,18 +18,32 @@
         <img src="assets/deskwithorb.png" id="desk-image" alt="Devililia at her desk">
     </div>
 
-    <!-- LAYER 3: The Active Game Area (Orb) -->
+    <!-- LAYER 3: The Active Game Area (Orb & Motes) -->
     <div id="mote-container" class="layer">
         <img src="assets/orb.png" id="crystal-orb" alt="Aether Dial">
     </div>
 
     <!-- LAYER 4: The User Interface -->
     <div id="ui-layer" class="layer">
-        <div id="currency-display">
-            <h2>Echoes: <span id="echo-count">0</span></h2>
-            <p id="echo-rate">0 / sec</p>
+        <!-- Top HUD: Drift Meter & Currency -->
+        <div id="top-hud">
+            <div id="drift-container">
+                <div id="drift-label">Liminal Drift</div>
+                <div id="drift-bar-bg">
+                    <div id="drift-bar-fill"></div>
+                </div>
+            </div>
+            
+            <div id="currency-display">
+                <h2>Echoes: <span id="echo-count">0</span></h2>
+                <p id="echo-rate">0 / sec</p>
+            </div>
         </div>
 
+        <!-- Ask for Reading Button (Hidden until 90%) -->
+        <button id="btn-tarot-reading" class="hidden">Ask for the Reading</button>
+
+        <!-- Bottom HUD: Shop -->
         <div id="shop-container">
             <h3>The Aether Machine</h3>
             <div class="shop-grid" id="shop-items">
@@ -37,28 +52,45 @@
         </div>
     </div>
 
-    <!-- LAYER 5: The Tarot Reading (Hidden by default) -->
+    <!-- LAYER 5: Psychological Dialogue Modal -->
+    <div id="dialogue-overlay" class="layer hidden">
+        <div class="dialogue-box">
+            <p id="dialogue-text"></p>
+            <div id="dialogue-choices"></div>
+        </div>
+    </div>
+
+    <!-- LAYER 6: Tea Timer Overlay -->
+    <div id="tea-timer-overlay" class="layer hidden">
+        <div class="tea-container">
+            <img src="assets/teacup.png" alt="Chamomile Tea" id="tea-icon">
+            <p>Resting...</p>
+            <div id="tea-bar-bg">
+                <div id="tea-bar-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LAYER 7: The Tarot Reading -->
     <div id="tarot-layer" class="layer hidden">
         <img src="assets/top-viewoftable.png" id="tarot-bg" alt="Top view of table">
-        
-        <!-- The 3 Cards -->
         <div id="card-container">
             <div class="tarot-card" id="card-1">
                 <div class="card-inner">
                     <div class="card-back"></div>
-                    <div class="card-front">The High Priestess</div>
+                    <div class="card-front" id="card-1-front">Card 1</div>
                 </div>
             </div>
             <div class="tarot-card" id="card-2">
                 <div class="card-inner">
                     <div class="card-back"></div>
-                    <div class="card-front">The Tower</div>
+                    <div class="card-front" id="card-2-front">Card 2</div>
                 </div>
             </div>
             <div class="tarot-card" id="card-3">
                 <div class="card-inner">
                     <div class="card-back"></div>
-                    <div class="card-front">The Fool</div>
+                    <div class="card-front" id="card-3-front">Card 3</div>
                 </div>
             </div>
         </div>
