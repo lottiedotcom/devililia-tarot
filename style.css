@@ -72,7 +72,6 @@ body, html {
   overflow: hidden;
 }
 
-/* --- MASSIVE ORB ON THE DESK --- */
 #crystal-orb {
   position: absolute;
   bottom: 18%; 
@@ -94,20 +93,23 @@ body, html {
   animation: orb-jump 0.16s ease-out;
 }
 
-/* --- BIGGER STAR MOTES --- */
+/* --- BIGGER STAR MOTES WITH MOBILE FIXES --- */
 .floating-mote {
   position: absolute;
-  width: 76px; /* Doubled size */
+  width: 90px; /* Made even bigger */
+  height: auto;
   cursor: pointer;
   z-index: 7;
   pointer-events: auto;
+  /* Blocks mobile "save image" popups and drag scrolling */
+  touch-action: none;
+  -webkit-touch-callout: none;
   animation: mote-float 4.5s ease-in-out infinite alternate;
 }
 
-/* --- DOUBLED ANIMATION MOVEMENT --- */
 @keyframes mote-float {
   0% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-24px) rotate(20deg); } /* Moved further, tilted more */
+  50% { transform: translateY(-24px) rotate(20deg); } 
   100% { transform: translateY(12px) rotate(-20deg); }
 }
 
@@ -117,7 +119,6 @@ body, html {
   animation: trapped-shake 0.3s infinite alternate !important;
 }
 
-/* Doubled the shake intensity to match the new size */
 @keyframes trapped-shake {
   0% { transform: translate(2px, 2px) rotate(0deg); }
   100% { transform: translate(-2px, -4px) rotate(-6deg); }
@@ -164,7 +165,6 @@ body, html {
   100% { transform: translate(-50%, -45px); opacity: 0; }
 }
 
-/* UI LAYER */
 #ui-layer {
   z-index: 10;
   pointer-events: none; 
@@ -509,14 +509,12 @@ body, html {
   border: 2px solid var(--soft-pink);
 }
 
-/* --- THE HOURLY BACKGROUND BLUR EFFECT --- */
 .hourly-blur {
   filter: blur(6px) brightness(0.6) saturate(0.8);
   transition: filter 1.5s ease-in-out;
   pointer-events: none;
 }
 
-/* --- HOURLY CLOCK EVENT & COUNTDOWN --- */
 #chime-overlay {
   z-index: 40; 
   background-image: url('assets/clockbg.png');
