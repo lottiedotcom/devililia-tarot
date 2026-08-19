@@ -1,4 +1,3 @@
-
 let echoes = 0;
 let echoesPerSecond = 0;
 let liminalDrift = 0; 
@@ -48,6 +47,18 @@ tarotAudio.volume = 0.5;
 const chimeAudio = new Audio('assets/chime.mp3');
 chimeAudio.volume = 0.9;
 
+// --- NEW TV AUDIO SETUP ---
+const tvOnAudio = new Audio('assets/tvon.mp3');
+tvOnAudio.loop = true;
+tvOnAudio.volume = 0.3;
+
+const tvCh1Audio = new Audio('assets/tvch1.mp3');
+tvCh1Audio.loop = true;
+tvCh1Audio.volume = 0.4;
+
+const tvDefaultOnAudio = new Audio('assets/tvdefaulton.mp3');
+const tvDefaultOffAudio = new Audio('assets/tvdefaultoff.mp3');
+
 // --- AUDIO LOOPING ---
 [gameplayAudio, tarotAudio].forEach(audio => {
   audio.addEventListener('ended', function() {
@@ -62,6 +73,8 @@ let isMusicPlaying = false;
 musicToggleBtn.addEventListener('click', () => {
   if (isMusicPlaying) {
     gameplayAudio.pause();
+    tvOnAudio.pause();
+    tvCh1Audio.pause();
     musicToggleBtn.innerText = '🔇';
     isMusicPlaying = false;
   } else {
@@ -71,7 +84,7 @@ musicToggleBtn.addEventListener('click', () => {
   }
 });
 
-// --- HOURLY CHIME LOGIC (NOW 15 SECONDS) ---
+// --- HOURLY CHIME LOGIC (15 SECONDS) ---
 function checkHourlyChime() {
   const now = new Date();
   if (now.getMinutes() === 0 && now.getSeconds() === 0 && !isChimeActive) {
@@ -89,7 +102,11 @@ function triggerHourlyChime() {
 
   chimeOverlay.classList.remove('hidden');
 
-  if (isMusicPlaying) gameplayAudio.pause();
+  if (isMusicPlaying) {
+    gameplayAudio.pause();
+    tvOnAudio.pause();
+    tvCh1Audio.pause();
+  }
   chimeAudio.currentTime = 0;
   chimeAudio.play().catch(()=>{});
 
@@ -103,7 +120,7 @@ function triggerHourlyChime() {
     chimeParticlesContainer.appendChild(sparkle);
   }
 
-  let timeLeft = 15; // Updated to 15 seconds!
+  let timeLeft = 15; 
   chimeTimerDisplay.innerText = timeLeft;
   
   clearInterval(chimeCountdownInterval);
@@ -128,7 +145,7 @@ function triggerHourlyChime() {
     }
     
     isChimeActive = false;
-  }, 15000); // Wait 15000ms (15 seconds)
+  }, 15000); 
 }
 
 // --- RECURRING TEA TIME LOGIC ---
@@ -208,14 +225,14 @@ const checkpoints = [
 ];
 
 const shopItems = [
-  { id: 'hourglass', name: 'Hourglass Shard', cost: 15, income: 1, count: 0, icon: 'assets/item-hourglass.png' },
-  { id: 'polaroid', name: 'Fading Polaroid', cost: 75, income: 3, count: 0, icon: 'assets/item-polaroid.png' },
-  { id: 'moontear', name: 'The Moon Tear', cost: 240, income: 8, count: 0, icon: 'assets/item-moontear.png' },
-  { id: 'tv', name: 'Static Television', cost: 900, income: 25, count: 0, icon: 'assets/item-tv.png' },
-  { id: 'letter', name: 'Unopened Letter', cost: 3200, income: 70, count: 0, icon: 'assets/item-letter.png' },
-  { id: 'clock', name: 'Melding Clock', cost: 9500, income: 180, count: 0, icon: 'assets/item-clock.png' },
-  { id: 'mirror', name: 'Corridor Mirror', cost: 28000, income: 450, count: 0, icon: 'assets/item-mirror.png' },
-  { id: 'pillow', name: 'Ghost Cat Pillow', cost: 85000, income: 1200, count: 0, icon: 'assets/item-pillow.png' }
+  { id: 'hourglass', name: 'Hourglass Shard', cost: 15, income: 1, count: 0, elementId: 'room-hourglass', icon: 'assets/item-hourglass.png' },
+  { id: 'polaroid', name: 'Fading Polaroid', cost: 75, income: 3, count: 0, elementId: 'room-polaroid', icon: 'assets/item-polaroid.png' },
+  { id: 'moontear', name: 'The Moon Tear', cost: 240, income: 8, count: 0, elementId: 'room-moontear', icon: 'assets/item-moontear.png' },
+  { id: 'tv', name: 'Static Television', cost: 900, income: 25, count: 0, elementId: 'room-tv', icon: 'assets/item-tv.png' },
+  { id: 'letter', name: 'Unopened Letter', cost: 3200, income: 70, count: 0, elementId: 'room-letter', icon: 'assets/item-letter.png' },
+  { id: 'clock', name: 'Melding Clock', cost: 9500, income: 180, count: 0, elementId: 'room-clock', icon: 'assets/item-clock.png' },
+  { id: 'mirror', name: 'Corridor Mirror', cost: 28000, income: 450, count: 0, elementId: 'room-mirror', icon: 'assets/item-mirror.png' },
+  { id: 'pillow', name: 'Ghost Cat Pillow', cost: 85000, income: 1200, count: 0, elementId: 'room-pillow', icon: 'assets/item-pillow.png' }
 ];
 
 const moteThoughts = [
@@ -262,7 +279,6 @@ function triggerOrbJump() {
   crystalOrb.classList.add('jumping');
 }
 
-// --- GLIDING MOTE LOGIC ---
 function spawnMote() {
   if(isCheckpointActive || isChimeActive) return;
 
@@ -274,7 +290,6 @@ function spawnMote() {
   const isTrapped = Math.random() < 0.15;
   if (isTrapped) mote.classList.add('trapped-mote');
 
-  // Spawn lower down on the screen
   const startX = Math.random() * (window.innerWidth - 90); 
   const startY = window.innerHeight * 0.7; 
   mote.style.left = `${startX}px`;
@@ -306,13 +321,10 @@ function spawnMote() {
   mote.addEventListener('pointercancel', cancelHold);
 
   moteContainer.appendChild(mote);
-
-  // Force the browser to render the mote at the bottom before moving it
   void mote.offsetWidth;
 
-  // Calculate a drift destination (moving upwards and sideways)
   const endX = startX + ((Math.random() > 0.5 ? 1 : -1) * (Math.random() * 300 + 100)); 
-  const endY = -100; // Float completely off the top of the screen
+  const endY = -100; 
   
   mote.style.left = `${endX}px`;
   mote.style.top = `${endY}px`;
@@ -395,27 +407,118 @@ function renderShop() {
   });
 }
 
-// --- FIXED SHOP UI UPDATE ---
 function buyShopItem(index) {
   if (isCheckpointActive || isChimeActive) return;
   const item = shopItems[index];
   if (echoes >= item.cost) {
     echoes -= item.cost;
     item.count += 1;
-    item.cost = Math.floor(item.cost * 1.23); // Core math works!
+    item.cost = Math.floor(item.cost * 1.23); 
     
     calculateEchoRate();
     updateUI();
     
-    // Explicitly update the text of this specific item in the menu
     const shopItemElements = document.querySelectorAll('.shop-item');
     const costDisplay = shopItemElements[index].querySelector('.item-cost');
     const countDisplay = shopItemElements[index].querySelector('.item-count');
     
     if (costDisplay) costDisplay.innerText = `${item.cost} Echoes`;
     if (countDisplay) countDisplay.innerText = `Owned: ${item.count}`;
+
+    if (item.elementId) {
+      const roomElement = document.getElementById(item.elementId);
+      if (roomElement) {
+        roomElement.classList.remove('hidden');
+      }
+    }
   }
 }
+
+// --- INTERACTIVE ROOM ITEMS LOGIC ---
+const roomMirror = document.getElementById('room-mirror');
+const mirrorReflections = [
+  { file: 'assets/item-mirror.png', lore: "You look at the glass too long, you start seeing things that aren't there... or maybe they've always been there." },
+  { file: 'assets/mirrorgirl.png', lore: "A pale silhouette stands just behind your shoulder. When you blink, it doesn't." },
+  { file: 'assets/mirrorpool.png', lore: "Don't try to touch it. The surface tension in there is... hungry." },
+  { file: 'assets/mirrorhall.png', lore: "That's the way out. It’s been locked from this side for a very, very long time." },
+  { file: 'assets/mirrorchurch.png', lore: "The scent of old dust and cold stone drifts out from the glass." }
+];
+
+roomMirror.addEventListener('click', () => {
+  if (isCheckpointActive || isChimeActive) return;
+  
+  let chosen;
+  const roll = Math.random();
+  if (roll < 0.6) {
+    chosen = mirrorReflections[0];
+  } else {
+    const spookyIndex = Math.floor(Math.random() * 4) + 1;
+    chosen = mirrorReflections[spookyIndex];
+  }
+
+  roomMirror.src = chosen.file;
+  spawnFloatingText(window.innerWidth / 2, window.innerHeight / 3, chosen.lore);
+
+  setTimeout(() => {
+    roomMirror.src = mirrorReflections[0].file;
+  }, 4000);
+});
+
+// TV Logic with Click Sound Effects
+const roomTv = document.getElementById('room-tv');
+let tvState = 0; 
+
+roomTv.addEventListener('click', () => {
+  if (isCheckpointActive || isChimeActive) return;
+
+  tvState++;
+  
+  if (Math.random() < 0.1) {
+    tvState = 3; 
+  }
+
+  if (tvState === 1) {
+    roomTv.src = 'assets/tvon.png';
+    if (isMusicPlaying) {
+      tvDefaultOnAudio.currentTime = 0;
+      tvDefaultOnAudio.play().catch(()=>{});
+      tvOnAudio.currentTime = 0;
+      tvOnAudio.play().catch(()=>{});
+    }
+    spawnFloatingText(roomTv.getBoundingClientRect().left, roomTv.getBoundingClientRect().top, "A distant city hums from the speaker...");
+  } else if (tvState === 2) {
+    roomTv.src = 'assets/tvch1.png';
+    tvOnAudio.pause();
+    if (isMusicPlaying) {
+      tvCh1Audio.currentTime = 0;
+      tvCh1Audio.play().catch(()=>{});
+    }
+    spawnFloatingText(roomTv.getBoundingClientRect().left, roomTv.getBoundingClientRect().top, "Static pulses with a jagged rhythm...");
+  } else {
+    tvState = 0;
+    roomTv.src = 'assets/item-tv.png';
+    tvOnAudio.pause();
+    tvCh1Audio.pause();
+    if (isMusicPlaying) {
+      tvDefaultOffAudio.currentTime = 0;
+      tvDefaultOffAudio.play().catch(()=>{});
+    }
+    spawnFloatingText(roomTv.getBoundingClientRect().left, roomTv.getBoundingClientRect().top, "The screen goes dark.");
+  }
+});
+
+const roomLetter = document.getElementById('room-letter');
+roomLetter.addEventListener('click', () => {
+  if (isCheckpointActive || isChimeActive) return;
+  spawnFloatingText(roomLetter.getBoundingClientRect().left, roomLetter.getBoundingClientRect().top - 20, "It’s addressed to no one, but it still feels like it’s waiting for a reply.");
+});
+
+const roomHourglass = document.getElementById('room-hourglass');
+roomHourglass.addEventListener('click', () => {
+  if (isCheckpointActive || isChimeActive) return;
+  spawnFloatingText(roomHourglass.getBoundingClientRect().left, roomHourglass.getBoundingClientRect().top - 20, "Time slows down. Motes linger a bit longer.");
+});
+
 
 setInterval(() => {
   if (echoesPerSecond > 0 && !isCheckpointActive && !isChimeActive) {
@@ -506,6 +609,8 @@ function startTeaTimer(cp) {
   teaBarFill.style.width = '0%';
   
   gameplayAudio.pause();
+  tvOnAudio.pause();
+  tvCh1Audio.pause();
   teatimerAudio.currentTime = 0;
   teatimerAudio.play().catch(() => {});
   
@@ -537,6 +642,8 @@ const card3Front = document.getElementById('card-3-front');
 
 btnTarot.addEventListener('click', () => {
   gameplayAudio.pause();
+  tvOnAudio.pause();
+  tvCh1Audio.pause();
   teatimerAudio.pause();
   tarotAudio.currentTime = 0;
   tarotAudio.play().catch(() => {});
@@ -544,6 +651,7 @@ btnTarot.addEventListener('click', () => {
   document.getElementById('ui-layer').classList.add('hidden');
   document.getElementById('mote-container').classList.add('hidden');
   document.getElementById('desk-layer').classList.add('hidden');
+  document.getElementById('room-items-layer').classList.add('hidden');
   shopToggleBtn.classList.add('hidden'); 
   tarotLayer.classList.remove('hidden');
 
