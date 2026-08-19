@@ -26,7 +26,9 @@ const teaTimerOverlay = document.getElementById('tea-timer-overlay');
 const teaBarFill = document.getElementById('tea-bar-fill');
 
 const loreOverlay = document.getElementById('lore-overlay');
+const loreImage = document.getElementById('lore-image');
 const loreText = document.getElementById('lore-text');
+const loreCloseBtn = document.getElementById('lore-close-btn');
 
 const musicToggleBtn = document.getElementById('music-toggle-btn');
 
@@ -267,9 +269,7 @@ function increaseDrift() {
   checkTriggers();
 }
 
-// CRITICAL FIX: Block context menu on the Orb
 crystalOrb.addEventListener('contextmenu', (e) => e.preventDefault());
-
 crystalOrb.addEventListener('click', (e) => {
   if(isCheckpointActive || isChimeActive) return;
   addEchoes(1);
@@ -291,8 +291,6 @@ function spawnMote() {
   mote.src = 'assets/mote.png';
   mote.className = 'floating-mote';
   mote.draggable = false; 
-  
-  // CRITICAL FIX: Block context menu on floating motes
   mote.addEventListener('contextmenu', (e) => e.preventDefault());
   
   const isTrapped = Math.random() < 0.15;
@@ -487,33 +485,40 @@ const loreData = {
 };
 
 // --- HOLD-TO-INSPECT LOGIC MANAGER ---
-function showLore(itemId) {
+function showLore(itemId, imageSrc) {
   const snippets = loreData[itemId];
   const randomSnippet = snippets[Math.floor(Math.random() * snippets.length)];
+  
+  // Set the image and text in the popup
+  loreImage.src = imageSrc;
   loreText.innerText = randomSnippet;
   loreOverlay.classList.remove('hidden');
 }
 
-loreOverlay.addEventListener('click', () => {
+// Close Lore overlay via explicit close button
+loreCloseBtn.addEventListener('click', () => {
   loreOverlay.classList.add('hidden');
 });
 
+// CRITICAL FIX: The logic perfectly mirroring the trapped motes.
 function setupRoomItem(elementId, loreKey, tapCallback) {
   const el = document.getElementById(elementId);
   let holdTimer;
   let isHolding = false;
 
-  // CRITICAL FIX: This absolutely obliterates the mobile browser's "save image" menu!
   el.addEventListener('contextmenu', (e) => {
     e.preventDefault();
   });
 
   el.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
     if (isCheckpointActive || isChimeActive) return;
     isHolding = false;
+    
+    // Hold for 500ms to open lore
     holdTimer = setTimeout(() => {
       isHolding = true;
-      showLore(loreKey);
+      showLore(loreKey, el.src); 
     }, 500); 
   });
 
@@ -524,8 +529,10 @@ function setupRoomItem(elementId, loreKey, tapCallback) {
   el.addEventListener('pointerup', (e) => {
     clearTimeout(holdTimer);
     if (!isHolding && tapCallback) {
-      tapCallback(e); 
+      tapCallback(e); // Quick tap triggers action
     }
+    // Tiny delay resetting isHolding prevents ghost taps
+    setTimeout(() => { isHolding = false; }, 50); 
   });
 
   el.addEventListener('pointerleave', cancelHold);
