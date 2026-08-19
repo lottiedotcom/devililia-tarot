@@ -67,6 +67,10 @@ body, html {
   object-fit: contain;
   cursor: pointer;
   transition: transform 0.2s;
+  
+  /* THE MAGIC HITBOX FIX: Increases touch area invisibly by 50px total! */
+  padding: 25px; 
+  margin: -25px; 
 }
 
 .room-item:active {
@@ -244,20 +248,8 @@ body, html {
 
 #drift-label { font-size: 11px; color: var(--soft-pink); margin-bottom: 4px; }
 
-#drift-bar-bg {
-  width: 100%;
-  height: 8px;
-  background-color: #000;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-#drift-bar-fill {
-  height: 100%;
-  width: 0%;
-  background-color: var(--light-blue);
-  transition: width 0.3s ease-out;
-}
+#drift-bar-bg { width: 100%; height: 8px; background-color: #000; border-radius: 4px; overflow: hidden; }
+#drift-bar-fill { height: 100%; width: 0%; background-color: var(--light-blue); transition: width 0.3s ease-out; }
 
 #currency-display {
   flex: 1;
@@ -387,7 +379,6 @@ body, html {
   text-align: center;
 }
 
-/* LORE BOX SPECIFICS */
 #lore-image {
   width: 130px;
   height: auto;
@@ -416,9 +407,7 @@ body, html {
   transition: transform 0.1s;
 }
 
-#lore-close-btn:active {
-  transform: scale(0.9);
-}
+#lore-close-btn:active { transform: scale(0.9); }
 
 #dialogue-choices { display: flex; flex-direction: column; gap: 10px; }
 
