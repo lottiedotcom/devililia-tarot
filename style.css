@@ -72,13 +72,13 @@ body, html {
   overflow: hidden;
 }
 
-/* BIG ORB - POSITION RESTORED */
+/* --- MASSIVE ORB ON THE DESK --- */
 #crystal-orb {
   position: absolute;
-  bottom: 27%;
-  left: 72%; 
+  bottom: 18%; /* Dropped down to sit firmly on the desk */
+  left: 78%; /* Positioned right next to the candle */
   transform: translateX(-50%);
-  width: 145px; 
+  width: 200px; /* Cranked the size way up */
   cursor: pointer;
   z-index: 6;
   pointer-events: auto;
@@ -566,3 +566,4 @@ body, html {
   80% { opacity: 0.7; }
   100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
 }
+
