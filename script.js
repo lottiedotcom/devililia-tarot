@@ -342,3 +342,61 @@ function startTeaTimer(cp) {
 // --- INITIALIZE ---
 calculateEchoRate();
 updateUI();
+
+// --- THE TAROT FINALE ENGINE ---
+
+// Pre-load the tarot music
+const tarotAudio = new Audio('assets/Tarotgameplay.mp3');
+tarotAudio.loop = true;
+
+const tarotLayer = document.getElementById('tarot-layer');
+const card1Front = document.getElementById('card-1-front');
+const card2Front = document.getElementById('card-2-front');
+const card3Front = document.getElementById('card-3-front');
+
+// When the player clicks "Ask for the Reading"
+btnTarot.addEventListener('click', () => {
+  // 1. Swap Music
+  gameplayAudio.pause();
+  tarotAudio.volume = 0.5;
+  tarotAudio.play().catch(() => {});
+
+  // 2. Hide the hallway and main UI, show the top-down tarot table
+  document.getElementById('ui-layer').classList.add('hidden');
+  document.getElementById('mote-container').classList.add('hidden');
+  document.getElementById('desk-layer').classList.add('hidden');
+  tarotLayer.classList.remove('hidden');
+
+  // 3. Calculate Dominant Path & Generate Reading
+  generateTarotReading();
+});
+
+function generateTarotReading() {
+  // Find which path scored the highest
+  let dominantPath = Object.keys(paths).reduce((a, b) => paths[a] > paths[b] ? a : b);
+
+  // Default weirdness twist for the cards
+  let card1 = "The High Priestess\n\n(Drawn upside down near a flickering light. You know a secret, but it's about a room you haven't visited yet.)";
+  let card2 = "The Tower\n\n(The wallpaper is peeling. Sudden chaos, or maybe just a realization that the ceiling was painted on.)";
+  let card3 = "The Fool\n\n(Stepping off a ledge into a pile of static. A new beginning, completely untethered.)";
+
+  // Customize based on their psychological path
+  if (dominantPath === "threshold") {
+    card1 = "The Magician\n\n(You see the seams of this place. You manipulate the echoes well, but don't look too closely at the wiring.)";
+    card2 = "The Hermit\n\n(Holding a lantern in an endless hall. You are aware, but awareness is a lonely road.)";
+    card3 = "The Star\n\n(Clarity. You will find the exit, but you might decide you prefer the architecture here instead.)";
+  } else if (dominantPath === "attachment") {
+    card1 = "The Lovers\n\n(Two chairs facing each other, but only one has an indent. You are holding onto a ghost.)";
+    card2 = "Six of Cups\n\n(A jar full of old moon tears. Nostalgia is sweet, but it makes your pockets too heavy to run.)";
+    card3 = "Death\n\n(Not an ending, just a closed door. It's time to leave the key under the mat and walk away.)";
+  } else if (dominantPath === "void") {
+    card1 = "The Moon\n\n(Illusion. You think you are fading away, but you are just blending perfectly into the pastel wallpaper.)";
+    card2 = "Four of Swords\n\n(Resting in a display case. Detachment brings peace, but it also brings cold hands.)";
+    card3 = "The World\n\n(The hallway loops back on itself. Emptiness is complete. You belong to the corridor now.)";
+  }
+
+  // Inject text into the front of the cards
+  card1Front.innerText = card1;
+  card2Front.innerText = card2;
+  card3Front.innerText = card3;
+}
