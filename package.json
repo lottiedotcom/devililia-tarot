@@ -1,0 +1,11 @@
+{
+  "name": "devililias-tarot",
+  "version": "1.0.0",
+  "description": "A cozy-liminal idle clicker and tarot reading app.",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve ."
+  },
+  "author": "",
+  "license": "ISC"
+}
