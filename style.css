@@ -60,6 +60,8 @@ body, html {
   object-fit: contain;
   cursor: pointer;
   transition: transform 0.2s;
+  touch-action: none;
+  -webkit-touch-callout: none;
 }
 
 .room-item:active {
@@ -78,10 +80,11 @@ body, html {
   width: 55px;
 }
 
+/* ENLARGED POLAROID */
 #room-polaroid {
-  top: 47%;
-  right: 14%;
-  width: 48px;
+  top: 42%;
+  right: 12%;
+  width: 75px; 
   transform: rotate(5deg);
 }
 
@@ -93,10 +96,11 @@ body, html {
   z-index: 4;
 }
 
+/* MOVED HOURGLASS TO LEFT DESK */
 #room-hourglass {
-  bottom: 34%;
-  left: 31%;
-  width: 40px;
+  bottom: 28%;
+  left: 18%;
+  width: 45px;
   z-index: 4;
 }
 
@@ -430,9 +434,9 @@ body, html {
 .item-cost { font-size: 12px; font-weight: bold; color: var(--soft-pink); }
 .item-count { font-size: 10px; color: var(--light-blue); }
 
-#dialogue-overlay {
-  z-index: 20;
-  background-color: rgba(0, 0, 0, 0.7);
+#dialogue-overlay, #lore-overlay {
+  z-index: 50; /* Above everything */
+  background-color: rgba(0, 0, 0, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -440,7 +444,7 @@ body, html {
   transition: opacity 0.4s;
 }
 
-.dialogue-box {
+.dialogue-box, .lore-box {
   background-color: var(--ui-bg);
   border: 3px solid var(--light-blue);
   border-radius: 12px;
@@ -451,11 +455,18 @@ body, html {
   text-align: center;
 }
 
-#dialogue-text {
+#dialogue-text, #lore-text {
   font-size: 14px;
   line-height: 1.5;
   margin-bottom: 20px;
   color: var(--soft-pink);
+}
+
+.lore-hint {
+  font-size: 10px;
+  color: var(--sage-green);
+  opacity: 0.7;
+  margin-bottom: 0;
 }
 
 #dialogue-choices {
