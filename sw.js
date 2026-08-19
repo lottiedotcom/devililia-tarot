@@ -1,6 +1,5 @@
 const CACHE_NAME = 'devililia-tarot-v1';
 
-// List of all core files to cache for offline play
 const urlsToCache = [
   './',
   './index.html',
@@ -16,11 +15,20 @@ const urlsToCache = [
   './assets/teacup.png',
   './assets/card-back.png',
   './assets/top-viewoftable.png',
+  './assets/item-hourglass.png',
+  './assets/item-polaroid.png',
+  './assets/item-moontear.png',
+  './assets/item-tv.png',
+  './assets/item-letter.png',
+  './assets/item-clock.png',
+  './assets/item-mirror.png',
+  './assets/item-pillow.png',
   './assets/gameplay.mp3',
-  './assets/cardflip.mp3'
+  './assets/cardflip.mp3',
+  './assets/teatimer.mp3',
+  './assets/Tarotgameplay.mp3'
 ];
 
-// Install the service worker and open the cache
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -30,18 +38,15 @@ self.addEventListener('install', event => {
   );
 });
 
-// Fetch from cache when offline
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // Return cached version or fetch from network
         return response || fetch(event.request);
       })
   );
 });
 
-// Clean up old caches when updating
 self.addEventListener('activate', event => {
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
