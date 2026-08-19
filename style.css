@@ -72,7 +72,7 @@ body, html {
 
 #crystal-orb {
   position: absolute;
-  bottom: 27%;
+  bottom: 25%;
   left: 50%;
   transform: translateX(-50%);
   width: 130px;
@@ -142,38 +142,40 @@ body, html {
 
 #ui-layer {
   z-index: 10;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
   padding: 16px;
+  position: relative;
 }
 
+/* Redesigned Top HUD: Side-by-side and compact */
 #top-hud {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  flex-direction: row;
+  justify-content: center;
+  gap: 10px;
   align-items: center;
+  width: 100%;
 }
 
 #drift-container {
-  width: 200px;
+  flex: 1;
+  max-width: 150px;
   background-color: var(--ui-card-bg);
   border: 2px solid var(--light-blue);
   border-radius: 8px;
-  padding: 6px;
+  padding: 8px;
   text-align: center;
   backdrop-filter: blur(4px);
 }
 
 #drift-label {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--soft-pink);
   margin-bottom: 4px;
 }
 
 #drift-bar-bg {
   width: 100%;
-  height: 10px;
+  height: 8px;
   background-color: #000;
   border-radius: 4px;
   overflow: hidden;
@@ -187,17 +189,30 @@ body, html {
 }
 
 #currency-display {
+  flex: 1;
+  max-width: 150px;
   background-color: var(--ui-bg);
   border: 2px solid var(--light-blue);
-  border-radius: 14px;
-  padding: 12px 24px;
+  border-radius: 12px;
+  padding: 10px;
   text-align: center;
   backdrop-filter: blur(6px);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
 }
 
+#currency-display h2 {
+  font-size: 15px;
+}
+
+#echo-rate {
+  font-size: 11px;
+}
+
 #btn-tarot-reading {
-  align-self: center;
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
   background-color: var(--light-blue);
   color: var(--plum-dark);
   border: none;
@@ -217,16 +232,57 @@ body, html {
   100% { box-shadow: 0 0 10px var(--light-blue); }
 }
 
-#shop-container {
-  background-color: var(--ui-bg);
+/* The New Floating Shop Toggle Button */
+#shop-toggle-btn {
+  position: absolute;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--ui-card-bg);
   border: 2px solid var(--light-blue);
-  border-radius: 18px 18px 0 0;
-  padding: 14px;
+  color: var(--text-color);
+  padding: 12px 28px;
+  border-radius: 30px;
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 14px;
+  z-index: 15;
+  cursor: pointer;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.6);
+  backdrop-filter: blur(6px);
   pointer-events: auto;
-  max-height: 38vh;
+  transition: transform 0.1s;
+}
+
+#shop-toggle-btn:active {
+  transform: translateX(-50%) scale(0.95);
+}
+
+/* Redesigned Slide-Up Shop Container */
+#shop-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: var(--ui-bg);
+  border-top: 2px solid var(--light-blue);
+  border-radius: 20px 20px 0 0;
+  padding: 16px 16px 25px 16px;
+  pointer-events: auto;
+  max-height: 50vh;
   display: flex;
   flex-direction: column;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
+  
+  /* Hides it off the bottom of the screen */
+  transform: translateY(110%); 
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  z-index: 14;
+}
+
+/* This class triggers the slide up */
+#shop-container.open {
+  transform: translateY(0);
 }
 
 .shop-grid {
