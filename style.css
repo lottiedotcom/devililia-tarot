@@ -420,8 +420,8 @@ body, html {
 .tea-container { text-align: center; }
 
 #tea-icon {
-  width: 80px;
-  margin-bottom: 15px;
+  width: 100px;
+  margin-bottom: 20px;
   animation: mote-bob 3s infinite alternate ease-in-out;
 }
 
