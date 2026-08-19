@@ -52,7 +52,7 @@ body, html {
 /* --- ROOM SCRAPBOOK ITEMS --- */
 #room-items-layer {
   z-index: 3;
-  pointer-events: auto;
+  pointer-events: auto; /* Lets taps through to items */
 }
 
 .room-item, .floating-mote, #crystal-orb {
@@ -77,10 +77,7 @@ body, html {
 #room-mirror { top: 30%; right: 14%; width: 65px; }
 #room-polaroid { top: 42%; right: 11%; width: 85px; transform: rotate(5deg); }
 #room-letter { bottom: 22%; left: 48%; transform: translateX(-50%); width: 60px; z-index: 4; }
-
-/* MUCH BIGGER HOURGLASS */
 #room-hourglass { bottom: 27%; left: 15%; width: 85px; z-index: 4; }
-
 #room-moontear { top: 48%; left: 33%; width: 45px; animation: moontear-glow 3s infinite alternate ease-in-out; }
 
 @keyframes moontear-glow {
@@ -102,7 +99,8 @@ body, html {
 
 #mote-container {
   z-index: 5;
-  pointer-events: auto;
+  /* CRITICAL FIX: The invisible shield is gone! */
+  pointer-events: none; 
   position: relative;
   width: 100%;
   height: 100%;
@@ -117,7 +115,7 @@ body, html {
   width: 200px; 
   cursor: pointer;
   z-index: 6;
-  pointer-events: auto;
+  pointer-events: auto; /* Orb still works */
 }
 
 @keyframes orb-jump {
@@ -134,7 +132,7 @@ body, html {
   height: auto;
   cursor: pointer;
   z-index: 7;
-  pointer-events: auto;
+  pointer-events: auto; /* Motes still work */
   animation: mote-bob 4s ease-in-out infinite alternate;
   transition: left 12s linear, top 12s linear; 
 }
@@ -248,7 +246,7 @@ body, html {
 #drift-label { font-size: 11px; color: var(--soft-pink); margin-bottom: 4px; }
 
 #drift-bar-bg { width: 100%; height: 8px; background-color: #000; border-radius: 4px; overflow: hidden; }
-#drift-bar-fill { height: 100%; width: 0%; background-color: var(--light-blue); transition: width 0.3s ease-out; }
+#drift-bar-fill { height: 100%; width: 0%; background: var(--light-blue); transition: width 0.3s ease-out; }
 
 #currency-display {
   flex: 1;
@@ -359,7 +357,7 @@ body, html {
 
 #dialogue-overlay, #lore-overlay {
   z-index: 50; 
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.85);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -367,7 +365,7 @@ body, html {
   transition: opacity 0.4s;
 }
 
-.dialogue-box, .lore-box {
+.dialogue-box {
   background-color: var(--ui-bg);
   border: 3px solid var(--light-blue);
   border-radius: 12px;
@@ -378,31 +376,56 @@ body, html {
   text-align: center;
 }
 
+/* THE CUTE LORE BOX DESIGN */
+.lore-box {
+  background-color: var(--ui-card-bg);
+  border: 4px solid var(--soft-pink);
+  border-radius: 20px;
+  width: 85%;
+  max-width: 400px;
+  padding: 30px 20px;
+  box-shadow: 0 0 40px rgba(255, 203, 242, 0.5);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 #lore-image {
-  width: 130px;
-  height: auto;
-  margin-bottom: 20px;
-  filter: drop-shadow(0 0 10px var(--light-blue));
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+  margin-bottom: 25px;
+  filter: drop-shadow(0 0 15px var(--light-blue));
   animation: mote-bob 3s infinite alternate ease-in-out;
 }
 
-#dialogue-text, #lore-text {
+#dialogue-text {
   font-size: 14px;
   line-height: 1.5;
   margin-bottom: 20px;
   color: var(--soft-pink);
 }
 
+#lore-text {
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 25px;
+  color: var(--text-color);
+  text-shadow: 0 0 8px var(--plum-dark);
+  font-style: italic;
+}
+
 #lore-close-btn {
+  background-color: var(--light-blue);
+  color: var(--plum-dark);
   font-size: 15px;
-  color: var(--sage-green);
   font-weight: bold;
   text-transform: uppercase;
+  padding: 12px 30px;
+  border-radius: 25px;
   cursor: pointer;
-  margin-top: 15px;
-  display: inline-block;
-  padding: 5px 15px;
-  border-bottom: 2px solid var(--sage-green);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
   transition: transform 0.1s;
 }
 
@@ -534,4 +557,3 @@ body, html {
   80% { opacity: 0.7; }
   100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
 }
-
