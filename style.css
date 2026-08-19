@@ -33,7 +33,7 @@ body, html {
   left: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none; /* Default lets clicks pass through */
+  pointer-events: none;
 }
 
 .hidden {
@@ -72,13 +72,12 @@ body, html {
   overflow: hidden;
 }
 
-/* MOVED THE ORB TO THE RIGHT! */
 #crystal-orb {
   position: absolute;
   bottom: 27%;
-  left: 72%; /* Pushes it to the right side next to the candle */
+  left: 72%; 
   transform: translateX(-50%);
-  width: 110px; /* Slightly adjusted to fit perfectly on the desk space */
+  width: 110px; 
   cursor: pointer;
   z-index: 6;
   pointer-events: auto;
@@ -144,15 +143,41 @@ body, html {
   100% { transform: translate(-50%, -45px); opacity: 0; }
 }
 
-/* UI LAYER FIXES */
 #ui-layer {
   z-index: 10;
-  pointer-events: none; /* Let clicks hit the orb */
+  pointer-events: none;
+}
+
+/* NEW MUSIC BUTTON STYLING */
+#music-toggle-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 40px;
+  height: 40px;
+  background-color: var(--ui-card-bg);
+  border: 2px solid var(--light-blue);
+  border-radius: 50%;
+  color: var(--text-color);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 15;
+  backdrop-filter: blur(4px);
+  pointer-events: auto;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  transition: transform 0.1s;
+}
+
+#music-toggle-btn:active {
+  transform: scale(0.9);
 }
 
 #top-hud {
   position: absolute;
-  top: 15px; /* Stick to the top */
+  top: 15px;
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -160,6 +185,7 @@ body, html {
   gap: 10px;
   align-items: center;
   pointer-events: auto;
+  padding: 0 60px; /* Keeps it from overlapping the new button */
 }
 
 #drift-container {
@@ -235,7 +261,7 @@ body, html {
 
 #shop-toggle-btn {
   position: absolute;
-  bottom: 25px; /* Stick to the bottom */
+  bottom: 25px;
   left: 50%;
   transform: translateX(-50%);
   background-color: var(--ui-card-bg);
