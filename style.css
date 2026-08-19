@@ -75,10 +75,10 @@ body, html {
 /* --- MASSIVE ORB ON THE DESK --- */
 #crystal-orb {
   position: absolute;
-  bottom: 18%; /* Dropped down to sit firmly on the desk */
-  left: 58%; /* Positioned right next to the candle */
+  bottom: 18%; 
+  left: 58%; 
   transform: translateX(-50%);
-  width: 200px; /* Cranked the size way up */
+  width: 200px; 
   cursor: pointer;
   z-index: 6;
   pointer-events: auto;
@@ -94,19 +94,21 @@ body, html {
   animation: orb-jump 0.16s ease-out;
 }
 
+/* --- BIGGER STAR MOTES --- */
 .floating-mote {
   position: absolute;
-  width: 38px;
+  width: 76px; /* Doubled size */
   cursor: pointer;
   z-index: 7;
   pointer-events: auto;
   animation: mote-float 4.5s ease-in-out infinite alternate;
 }
 
+/* --- DOUBLED ANIMATION MOVEMENT --- */
 @keyframes mote-float {
   0% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-12px) rotate(15deg); }
-  100% { transform: translateY(6px) rotate(-15deg); }
+  50% { transform: translateY(-24px) rotate(20deg); } /* Moved further, tilted more */
+  100% { transform: translateY(12px) rotate(-20deg); }
 }
 
 /* THE TRAPPED MOTE EFFECTS */
@@ -115,9 +117,10 @@ body, html {
   animation: trapped-shake 0.3s infinite alternate !important;
 }
 
+/* Doubled the shake intensity to match the new size */
 @keyframes trapped-shake {
-  0% { transform: translate(1px, 1px) rotate(0deg); }
-  100% { transform: translate(-1px, -2px) rotate(-3deg); }
+  0% { transform: translate(2px, 2px) rotate(0deg); }
+  100% { transform: translate(-2px, -4px) rotate(-6deg); }
 }
 
 .trapped-mote.holding {
