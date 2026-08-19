@@ -67,30 +67,28 @@ body, html {
   object-fit: contain;
   cursor: pointer;
   transition: transform 0.2s;
-  
-  /* THE MAGIC HITBOX FIX: Increases touch area invisibly by 50px total! */
-  padding: 25px; 
-  margin: -25px; 
+  /* Removed the terrible padding hack! */
 }
 
 .room-item:active {
   transform: scale(0.95);
 }
 
-#room-clock { top: 22%; left: 12%; width: 55px; }
-#room-mirror { top: 30%; right: 15%; width: 55px; }
-#room-polaroid { top: 42%; right: 12%; width: 75px; transform: rotate(5deg); }
-#room-letter { bottom: 22%; left: 48%; transform: translateX(-50%); width: 50px; z-index: 4; }
-#room-hourglass { bottom: 28%; left: 18%; width: 45px; z-index: 4; }
-#room-moontear { top: 48%; left: 33%; width: 35px; animation: moontear-glow 3s infinite alternate ease-in-out; }
+/* Base sizes slightly increased to naturally improve mobile tapping */
+#room-clock { top: 22%; left: 12%; width: 65px; }
+#room-mirror { top: 30%; right: 14%; width: 65px; }
+#room-polaroid { top: 42%; right: 11%; width: 85px; transform: rotate(5deg); }
+#room-letter { bottom: 22%; left: 48%; transform: translateX(-50%); width: 60px; z-index: 4; }
+#room-hourglass { bottom: 28%; left: 18%; width: 55px; z-index: 4; }
+#room-moontear { top: 48%; left: 33%; width: 45px; animation: moontear-glow 3s infinite alternate ease-in-out; }
 
 @keyframes moontear-glow {
   0% { filter: drop-shadow(0 0 2px var(--light-blue)); }
   100% { filter: drop-shadow(0 0 10px var(--soft-pink)); }
 }
 
-#room-tv { bottom: 8%; left: 10%; width: 75px; }
-#room-pillow { bottom: 6%; right: 12%; width: 80px; }
+#room-tv { bottom: 8%; left: 10%; width: 85px; }
+#room-pillow { bottom: 6%; right: 12%; width: 95px; }
 
 #desk-layer {
   z-index: 2;
@@ -535,3 +533,4 @@ body, html {
   80% { opacity: 0.7; }
   100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
 }
+
