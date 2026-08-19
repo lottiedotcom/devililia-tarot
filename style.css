@@ -55,7 +55,6 @@ body, html {
   pointer-events: auto;
 }
 
-/* CRITICAL: Strict rules to block the mobile magnifier and copy-paste menus */
 .room-item, .floating-mote, #crystal-orb {
   -webkit-touch-callout: none !important;
   -webkit-user-select: none !important;
@@ -74,63 +73,20 @@ body, html {
   transform: scale(0.95);
 }
 
-#room-clock {
-  top: 22%;
-  left: 12%;
-  width: 55px;
-}
-
-#room-mirror {
-  top: 30%;
-  right: 15%;
-  width: 55px;
-}
-
-#room-polaroid {
-  top: 42%;
-  right: 12%;
-  width: 75px; 
-  transform: rotate(5deg);
-}
-
-#room-letter {
-  bottom: 22%;
-  left: 48%;
-  transform: translateX(-50%);
-  width: 50px;
-  z-index: 4;
-}
-
-#room-hourglass {
-  bottom: 28%;
-  left: 18%;
-  width: 45px;
-  z-index: 4;
-}
-
-#room-moontear {
-  top: 48%;
-  left: 33%;
-  width: 35px;
-  animation: moontear-glow 3s infinite alternate ease-in-out;
-}
+#room-clock { top: 22%; left: 12%; width: 55px; }
+#room-mirror { top: 30%; right: 15%; width: 55px; }
+#room-polaroid { top: 42%; right: 12%; width: 75px; transform: rotate(5deg); }
+#room-letter { bottom: 22%; left: 48%; transform: translateX(-50%); width: 50px; z-index: 4; }
+#room-hourglass { bottom: 28%; left: 18%; width: 45px; z-index: 4; }
+#room-moontear { top: 48%; left: 33%; width: 35px; animation: moontear-glow 3s infinite alternate ease-in-out; }
 
 @keyframes moontear-glow {
   0% { filter: drop-shadow(0 0 2px var(--light-blue)); }
   100% { filter: drop-shadow(0 0 10px var(--soft-pink)); }
 }
 
-#room-tv {
-  bottom: 8%;
-  left: 10%;
-  width: 75px;
-}
-
-#room-pillow {
-  bottom: 6%;
-  right: 12%;
-  width: 80px;
-}
+#room-tv { bottom: 8%; left: 10%; width: 75px; }
+#room-pillow { bottom: 6%; right: 12%; width: 80px; }
 
 #desk-layer {
   z-index: 2;
@@ -139,12 +95,7 @@ body, html {
   justify-content: center;
 }
 
-#desk-image {
-  width: 100%;
-  max-width: 580px;
-  height: auto;
-  object-fit: contain;
-}
+#desk-image { width: 100%; max-width: 580px; height: auto; object-fit: contain; }
 
 #mote-container {
   z-index: 5;
@@ -172,9 +123,7 @@ body, html {
   100% { transform: translateX(-50%) translateY(0) scale(1); }
 }
 
-.jumping {
-  animation: orb-jump 0.16s ease-out;
-}
+.jumping { animation: orb-jump 0.16s ease-out; }
 
 .floating-mote {
   position: absolute;
@@ -243,10 +192,7 @@ body, html {
   100% { transform: translate(-50%, -45px); opacity: 0; }
 }
 
-#ui-layer {
-  z-index: 10;
-  pointer-events: none; 
-}
+#ui-layer { z-index: 10; pointer-events: none; }
 
 #music-toggle-btn {
   position: absolute;
@@ -270,9 +216,7 @@ body, html {
   transition: transform 0.1s;
 }
 
-#music-toggle-btn:active {
-  transform: scale(0.9);
-}
+#music-toggle-btn:active { transform: scale(0.9); }
 
 #top-hud {
   position: absolute;
@@ -298,11 +242,7 @@ body, html {
   backdrop-filter: blur(4px);
 }
 
-#drift-label {
-  font-size: 11px;
-  color: var(--soft-pink);
-  margin-bottom: 4px;
-}
+#drift-label { font-size: 11px; color: var(--soft-pink); margin-bottom: 4px; }
 
 #drift-bar-bg {
   width: 100%;
@@ -379,9 +319,7 @@ body, html {
   transition: transform 0.1s;
 }
 
-#shop-toggle-btn:active {
-  transform: translateX(-50%) scale(0.95);
-}
+#shop-toggle-btn:active { transform: translateX(-50%) scale(0.95); }
 
 #shop-container {
   position: absolute;
@@ -402,17 +340,9 @@ body, html {
   z-index: 14;
 }
 
-#shop-container.open {
-  transform: translateY(0);
-}
+#shop-container.open { transform: translateY(0); }
 
-.shop-grid {
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding-right: 4px;
-}
+.shop-grid { overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px; }
 
 .shop-item {
   display: flex;
@@ -457,6 +387,15 @@ body, html {
   text-align: center;
 }
 
+/* LORE BOX SPECIFICS */
+#lore-image {
+  width: 130px;
+  height: auto;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 0 10px var(--light-blue));
+  animation: mote-bob 3s infinite alternate ease-in-out;
+}
+
 #dialogue-text, #lore-text {
   font-size: 14px;
   line-height: 1.5;
@@ -464,18 +403,24 @@ body, html {
   color: var(--soft-pink);
 }
 
-.lore-hint {
-  font-size: 10px;
+#lore-close-btn {
+  font-size: 15px;
   color: var(--sage-green);
-  opacity: 0.7;
-  margin-bottom: 0;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-top: 15px;
+  display: inline-block;
+  padding: 5px 15px;
+  border-bottom: 2px solid var(--sage-green);
+  transition: transform 0.1s;
 }
 
-#dialogue-choices {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+#lore-close-btn:active {
+  transform: scale(0.9);
 }
+
+#dialogue-choices { display: flex; flex-direction: column; gap: 10px; }
 
 .choice-btn {
   background-color: var(--ui-card-bg);
@@ -508,33 +453,11 @@ body, html {
   animation: mote-bob 3s infinite alternate ease-in-out;
 }
 
-#tea-bar-bg {
-  width: 200px;
-  height: 8px;
-  background: #333;
-  border-radius: 4px;
-  margin: 10px auto 0;
-  overflow: hidden;
-}
+#tea-bar-bg { width: 200px; height: 8px; background: #333; border-radius: 4px; margin: 10px auto 0; overflow: hidden; }
+#tea-bar-fill { height: 100%; width: 0%; background: var(--sage-green); transition: width 1s linear; }
 
-#tea-bar-fill {
-  height: 100%;
-  width: 0%;
-  background: var(--sage-green);
-  transition: width 1s linear;
-}
-
-#tarot-layer {
-  z-index: 30;
-  background-color: #000;
-}
-
-#tarot-bg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  position: absolute;
-}
+#tarot-layer { z-index: 30; background-color: #000; }
+#tarot-bg { width: 100%; height: 100%; object-fit: cover; position: absolute; }
 
 #card-container {
   position: absolute;
@@ -547,21 +470,8 @@ body, html {
   pointer-events: auto;
 }
 
-.tarot-card {
-  width: 95px;
-  height: 155px;
-  perspective: 1000px;
-  cursor: pointer;
-}
-
-.card-inner {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-style: preserve-3d;
-}
-
+.tarot-card { width: 95px; height: 155px; perspective: 1000px; cursor: pointer; }
+.card-inner { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
 .tarot-card.flipped .card-inner { transform: rotateY(180deg); }
 
 .card-back, .card-front {
@@ -573,12 +483,7 @@ body, html {
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7);
 }
 
-.card-back {
-  background-image: url('assets/card-back.png');
-  background-size: cover;
-  background-position: center;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
+.card-back { background-image: url('assets/card-back.png'); background-size: cover; background-position: center; border: 1px solid rgba(255, 255, 255, 0.3); }
 
 .card-front {
   background-color: var(--plum-dark);
@@ -594,11 +499,7 @@ body, html {
   border: 2px solid var(--soft-pink);
 }
 
-.hourly-blur {
-  filter: blur(6px) brightness(0.6) saturate(0.8);
-  transition: filter 1.5s ease-in-out;
-  pointer-events: none;
-}
+.hourly-blur { filter: blur(6px) brightness(0.6) saturate(0.8); transition: filter 1.5s ease-in-out; pointer-events: none; }
 
 #chime-overlay {
   z-index: 40; 
@@ -627,14 +528,7 @@ body, html {
   100% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 25px var(--soft-pink), 0 0 40px var(--light-blue); }
 }
 
-#chime-particles {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  z-index: 41;
-  pointer-events: none;
-  overflow: hidden;
-}
+#chime-particles { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 41; pointer-events: none; overflow: hidden; }
 
 .chime-sparkle {
   position: absolute;
