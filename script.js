@@ -25,6 +25,9 @@ const dialogueChoices = document.getElementById('dialogue-choices');
 const teaTimerOverlay = document.getElementById('tea-timer-overlay');
 const teaBarFill = document.getElementById('tea-bar-fill');
 
+const loreOverlay = document.getElementById('lore-overlay');
+const loreText = document.getElementById('lore-text');
+
 const musicToggleBtn = document.getElementById('music-toggle-btn');
 
 const chimeOverlay = document.getElementById('chime-overlay');
@@ -47,7 +50,6 @@ tarotAudio.volume = 0.5;
 const chimeAudio = new Audio('assets/chime.mp3');
 chimeAudio.volume = 0.9;
 
-// --- NEW TV AUDIO SETUP ---
 const tvOnAudio = new Audio('assets/tvon.mp3');
 tvOnAudio.loop = true;
 tvOnAudio.volume = 0.3;
@@ -84,7 +86,7 @@ musicToggleBtn.addEventListener('click', () => {
   }
 });
 
-// --- HOURLY CHIME LOGIC (15 SECONDS) ---
+// --- HOURLY CHIME LOGIC ---
 function checkHourlyChime() {
   const now = new Date();
   if (now.getMinutes() === 0 && now.getSeconds() === 0 && !isChimeActive) {
@@ -434,43 +436,123 @@ function buyShopItem(index) {
   }
 }
 
-// --- INTERACTIVE ROOM ITEMS LOGIC ---
-const roomMirror = document.getElementById('room-mirror');
-const mirrorReflections = [
-  { file: 'assets/item-mirror.png', lore: "You look at the glass too long, you start seeing things that aren't there... or maybe they've always been there." },
-  { file: 'assets/mirrorgirl.png', lore: "A pale silhouette stands just behind your shoulder. When you blink, it doesn't." },
-  { file: 'assets/mirrorpool.png', lore: "Don't try to touch it. The surface tension in there is... hungry." },
-  { file: 'assets/mirrorhall.png', lore: "That's the way out. It’s been locked from this side for a very, very long time." },
-  { file: 'assets/mirrorchurch.png', lore: "The scent of old dust and cold stone drifts out from the glass." }
-];
+// --- ITEM LORE DATABASE ---
+const loreData = {
+  hourglass: [
+    "At a certain point you stop tracking the sand, the years seem to go by here... I wonder how long I've been here..",
+    "It doesn't measure time seemingly.. it measures something else.",
+    "I like to play with it in my free time, it's nice to step away from here sometimes to just, be there."
+  ],
+  polaroid: [
+    "I took this the day I arrived. My face looked different then.",
+    "I swear the Ink has made me look more depressed.. or maybe I've always been this way.",
+    "I looked so pretty here .. do I still?"
+  ],
+  letter: [
+    "The wax smells like roses from, back then... It leaves my head dizzy.",
+    "The seal is made of dried wax and something... colder.",
+    "I keep it closed. Some news is better off unread."
+  ],
+  moontear: [
+    "It fell from the moon during an eclipse. I put it in a jar to cherish it.",
+    "It smells like rain and old metal.",
+    "If you hold it to your ear, you can hear the ocean."
+  ],
+  clock: [
+    "Time feels like it only existed beyond these walls, when was that again?",
+    "I've started to wonder if it represents how long I've been here or the way I feel, maybe it's just me.",
+    "It’s stuck on the hour you arrived. Every single day."
+  ],
+  pillow: [
+    "It's cold, I wonder where Kalt is, she's a good cat.",
+    "Always smells of lavender and fresh bread.. she does make great biscuits.",
+    "It likes to curl up in the spaces where the light doesn't reach."
+  ],
+  tv: [
+    "Shhhh, my favorite show is on.",
+    "Sometimes, if you lean in close, you can hear yourself breathing on the other side.",
+    "I swear I didn't turn it off, did you?"
+  ],
+  mirror: [
+    "It's the only thing in the room that doesn't lie to me.",
+    "Did you see that? Or is my mind elsewhere again..",
+    "That hall is familiar, It haunts me in my dreams."
+  ]
+};
 
-roomMirror.addEventListener('click', () => {
-  if (isCheckpointActive || isChimeActive) return;
-  
-  let chosen;
-  const roll = Math.random();
-  if (roll < 0.6) {
-    chosen = mirrorReflections[0];
-  } else {
-    const spookyIndex = Math.floor(Math.random() * 4) + 1;
-    chosen = mirrorReflections[spookyIndex];
-  }
+// --- HOLD-TO-INSPECT LOGIC MANAGER ---
+function showLore(itemId) {
+  const snippets = loreData[itemId];
+  const randomSnippet = snippets[Math.floor(Math.random() * snippets.length)];
+  loreText.innerText = randomSnippet;
+  loreOverlay.classList.remove('hidden');
+}
 
-  roomMirror.src = chosen.file;
-  spawnFloatingText(window.innerWidth / 2, window.innerHeight / 3, chosen.lore);
-
-  setTimeout(() => {
-    roomMirror.src = mirrorReflections[0].file;
-  }, 4000);
+// Close Lore overlay when tapped
+loreOverlay.addEventListener('click', () => {
+  loreOverlay.classList.add('hidden');
 });
 
-// TV Logic with Click Sound Effects
+function setupRoomItem(elementId, loreKey, tapCallback) {
+  const el = document.getElementById(elementId);
+  let holdTimer;
+  let isHolding = false;
+
+  el.addEventListener('pointerdown', (e) => {
+    if (isCheckpointActive || isChimeActive) return;
+    isHolding = false;
+    holdTimer = setTimeout(() => {
+      isHolding = true;
+      showLore(loreKey);
+    }, 500); // Hold for 500ms to open lore
+  });
+
+  const cancelHold = () => {
+    clearTimeout(holdTimer);
+  };
+
+  el.addEventListener('pointerup', (e) => {
+    clearTimeout(holdTimer);
+    if (!isHolding && tapCallback) {
+      tapCallback(e); // If it was a quick tap, run the action
+    }
+  });
+
+  el.addEventListener('pointerleave', cancelHold);
+  el.addEventListener('pointercancel', cancelHold);
+}
+
+// --- INTERACTIVE ROOM ITEMS SETUP ---
+
+// 1. Mirror
+const roomMirror = document.getElementById('room-mirror');
+const mirrorReflections = [
+  'assets/item-mirror.png',
+  'assets/mirrorgirl.png',
+  'assets/mirrorpool.png',
+  'assets/mirrorhall.png',
+  'assets/mirrorchurch.png'
+];
+
+setupRoomItem('room-mirror', 'mirror', () => {
+  let chosenFile;
+  const roll = Math.random();
+  if (roll < 0.6) {
+    chosenFile = mirrorReflections[0];
+  } else {
+    const spookyIndex = Math.floor(Math.random() * 4) + 1;
+    chosenFile = mirrorReflections[spookyIndex];
+  }
+
+  roomMirror.src = chosenFile;
+  setTimeout(() => { roomMirror.src = mirrorReflections[0]; }, 4000);
+});
+
+// 2. Television 
 const roomTv = document.getElementById('room-tv');
 let tvState = 0; 
 
-roomTv.addEventListener('click', () => {
-  if (isCheckpointActive || isChimeActive) return;
-
+setupRoomItem('room-tv', 'tv', () => {
   tvState++;
   
   if (Math.random() < 0.1) {
@@ -485,7 +567,6 @@ roomTv.addEventListener('click', () => {
       tvOnAudio.currentTime = 0;
       tvOnAudio.play().catch(()=>{});
     }
-    spawnFloatingText(roomTv.getBoundingClientRect().left, roomTv.getBoundingClientRect().top, "A distant city hums from the speaker...");
   } else if (tvState === 2) {
     roomTv.src = 'assets/tvch1.png';
     tvOnAudio.pause();
@@ -493,7 +574,6 @@ roomTv.addEventListener('click', () => {
       tvCh1Audio.currentTime = 0;
       tvCh1Audio.play().catch(()=>{});
     }
-    spawnFloatingText(roomTv.getBoundingClientRect().left, roomTv.getBoundingClientRect().top, "Static pulses with a jagged rhythm...");
   } else {
     tvState = 0;
     roomTv.src = 'assets/item-tv.png';
@@ -503,21 +583,23 @@ roomTv.addEventListener('click', () => {
       tvDefaultOffAudio.currentTime = 0;
       tvDefaultOffAudio.play().catch(()=>{});
     }
-    spawnFloatingText(roomTv.getBoundingClientRect().left, roomTv.getBoundingClientRect().top, "The screen goes dark.");
   }
 });
 
-const roomLetter = document.getElementById('room-letter');
-roomLetter.addEventListener('click', () => {
-  if (isCheckpointActive || isChimeActive) return;
-  spawnFloatingText(roomLetter.getBoundingClientRect().left, roomLetter.getBoundingClientRect().top - 20, "It’s addressed to no one, but it still feels like it’s waiting for a reply.");
+// 3. Other items (Quick tap effects)
+setupRoomItem('room-letter', 'letter', () => {
+  spawnFloatingText(document.getElementById('room-letter').getBoundingClientRect().left, document.getElementById('room-letter').getBoundingClientRect().top - 20, "Waiting...");
 });
 
-const roomHourglass = document.getElementById('room-hourglass');
-roomHourglass.addEventListener('click', () => {
-  if (isCheckpointActive || isChimeActive) return;
-  spawnFloatingText(roomHourglass.getBoundingClientRect().left, roomHourglass.getBoundingClientRect().top - 20, "Time slows down. Motes linger a bit longer.");
+setupRoomItem('room-hourglass', 'hourglass', () => {
+  spawnFloatingText(document.getElementById('room-hourglass').getBoundingClientRect().left, document.getElementById('room-hourglass').getBoundingClientRect().top - 20, "Time slows.");
 });
+
+// Items without quick tap actions, just lore holds
+setupRoomItem('room-polaroid', 'polaroid', null);
+setupRoomItem('room-moontear', 'moontear', null);
+setupRoomItem('room-clock', 'clock', null);
+setupRoomItem('room-pillow', 'pillow', null);
 
 
 setInterval(() => {
