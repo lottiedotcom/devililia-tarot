@@ -1,4 +1,3 @@
-/* --- PALETTE & BASE CONFIGURATION --- */
 :root {
   --plum: #8e5572;
   --plum-dark: #5c3549;
@@ -28,7 +27,6 @@ body, html {
   color: var(--text-color);
 }
 
-/* --- LAYER MANAGEMENT --- */
 .layer {
   position: absolute;
   top: 0;
@@ -38,7 +36,12 @@ body, html {
   pointer-events: none;
 }
 
-/* Dynamic Background */
+.hidden {
+  display: none !important;
+  opacity: 0;
+  pointer-events: none;
+}
+
 #background-layer {
   background-size: cover;
   background-position: center;
@@ -46,7 +49,6 @@ body, html {
   transition: background-image 1.5s ease-in-out;
 }
 
-/* Character & Desk Setup */
 #desk-layer {
   z-index: 2;
   display: flex;
@@ -59,10 +61,8 @@ body, html {
   max-width: 580px;
   height: auto;
   object-fit: contain;
-  pointer-events: none;
 }
 
-/* Interactive Clicker Layer */
 #mote-container {
   z-index: 5;
   pointer-events: auto;
@@ -76,12 +76,10 @@ body, html {
   left: 50%;
   transform: translateX(-50%);
   width: 130px;
-  height: auto;
   cursor: pointer;
   z-index: 6;
 }
 
-/* Orb Jump Keyframes */
 @keyframes orb-jump {
   0% { transform: translateX(-50%) translateY(0) scale(1); }
   45% { transform: translateX(-50%) translateY(-22px) scale(1.06); }
@@ -92,11 +90,9 @@ body, html {
   animation: orb-jump 0.16s ease-out;
 }
 
-/* Mote Floating Particles */
 .floating-mote {
   position: absolute;
   width: 38px;
-  height: 38px;
   cursor: pointer;
   z-index: 7;
   pointer-events: auto;
@@ -109,7 +105,6 @@ body, html {
   100% { transform: translateY(6px) rotate(-15deg); }
 }
 
-/* Ripple Explosion Effect */
 .ripple {
   position: absolute;
   width: 56px;
@@ -128,7 +123,6 @@ body, html {
   100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
 }
 
-/* Fleeting Thought Floating Text */
 .fleeting-thought {
   position: absolute;
   color: var(--soft-pink);
@@ -146,14 +140,50 @@ body, html {
   100% { transform: translate(-50%, -45px); opacity: 0; }
 }
 
-/* --- HUD & UI ELEMENTS --- */
 #ui-layer {
   z-index: 10;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 16px;
-  pointer-events: none;
+}
+
+#top-hud {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+#drift-container {
+  width: 200px;
+  background-color: var(--ui-card-bg);
+  border: 2px solid var(--light-blue);
+  border-radius: 8px;
+  padding: 6px;
+  text-align: center;
+  backdrop-filter: blur(4px);
+}
+
+#drift-label {
+  font-size: 12px;
+  color: var(--soft-pink);
+  margin-bottom: 4px;
+}
+
+#drift-bar-bg {
+  width: 100%;
+  height: 10px;
+  background-color: #000;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+#drift-bar-fill {
+  height: 100%;
+  width: 0%;
+  background-color: var(--light-blue);
+  transition: width 0.3s ease-out;
 }
 
 #currency-display {
@@ -161,26 +191,32 @@ body, html {
   border: 2px solid var(--light-blue);
   border-radius: 14px;
   padding: 12px 24px;
-  color: var(--text-color);
   text-align: center;
-  width: fit-content;
-  margin: 0 auto;
   backdrop-filter: blur(6px);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
 }
 
-#currency-display h2 {
-  font-size: 20px;
-  letter-spacing: 1px;
+#btn-tarot-reading {
+  align-self: center;
+  background-color: var(--light-blue);
+  color: var(--plum-dark);
+  border: none;
+  padding: 12px 24px;
+  font-family: inherit;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 0 15px var(--light-blue);
+  animation: pulse-glow 2s infinite;
+  pointer-events: auto;
 }
 
-#echo-rate {
-  font-size: 13px;
-  color: var(--soft-pink);
-  margin-top: 2px;
+@keyframes pulse-glow {
+  0% { box-shadow: 0 0 10px var(--light-blue); }
+  50% { box-shadow: 0 0 20px var(--soft-pink); }
+  100% { box-shadow: 0 0 10px var(--light-blue); }
 }
 
-/* --- SHOP PANEL --- */
 #shop-container {
   background-color: var(--ui-bg);
   border: 2px solid var(--light-blue);
@@ -193,30 +229,12 @@ body, html {
   backdrop-filter: blur(8px);
 }
 
-#shop-container h3 {
-  text-align: center;
-  color: var(--light-blue);
-  margin-bottom: 10px;
-  font-size: 15px;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-}
-
 .shop-grid {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding-right: 4px;
-}
-
-.shop-grid::-webkit-scrollbar {
-  width: 5px;
-}
-
-.shop-grid::-webkit-scrollbar-thumb {
-  background: var(--light-blue);
-  border-radius: 4px;
 }
 
 .shop-item {
@@ -228,70 +246,105 @@ body, html {
   padding: 8px 12px;
   gap: 12px;
   cursor: pointer;
-  transition: transform 0.1s, border-color 0.2s, background-color 0.2s;
+  transition: transform 0.1s;
 }
 
-.shop-item:active {
-  transform: scale(0.98);
+.shop-item:active { transform: scale(0.98); }
+.shop-item.disabled { opacity: 0.5; cursor: not-allowed; }
+.shop-item img { width: 40px; height: 40px; object-fit: contain; }
+.item-info { flex-grow: 1; }
+.item-name { font-size: 13px; font-weight: bold; }
+.item-stats { font-size: 11px; color: var(--sage-green); }
+.item-cost-box { text-align: right; }
+.item-cost { font-size: 12px; font-weight: bold; color: var(--soft-pink); }
+.item-count { font-size: 10px; color: var(--light-blue); }
+
+#dialogue-overlay {
+  z-index: 20;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  transition: opacity 0.4s;
 }
 
-.shop-item.disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  border-color: rgba(255, 255, 255, 0.15);
+.dialogue-box {
+  background-color: var(--ui-bg);
+  border: 3px solid var(--light-blue);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  text-align: center;
 }
 
-.shop-item img {
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
-}
-
-.item-info {
-  flex-grow: 1;
-}
-
-.item-name {
-  font-size: 13px;
-  font-weight: bold;
-  color: var(--text-color);
-}
-
-.item-stats {
-  font-size: 11px;
-  color: var(--sage-green);
-}
-
-.item-cost-box {
-  text-align: right;
-}
-
-.item-cost {
-  font-size: 12px;
-  font-weight: bold;
+#dialogue-text {
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 20px;
   color: var(--soft-pink);
 }
 
-.item-count {
-  font-size: 10px;
-  color: var(--light-blue);
+#dialogue-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-/* --- TAROT SCENE --- */
-.hidden {
-  display: none !important;
-  opacity: 0;
-  pointer-events: none;
+.choice-btn {
+  background-color: var(--ui-card-bg);
+  border: 1px solid var(--light-blue);
+  color: var(--text-color);
+  padding: 12px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.choice-btn:hover { background-color: var(--plum-dark); }
+
+#tea-timer-overlay {
+  z-index: 25;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+.tea-container {
+  text-align: center;
+}
+
+#tea-icon {
+  width: 80px;
+  margin-bottom: 15px;
+  animation: mote-float 3s infinite alternate ease-in-out;
+}
+
+#tea-bar-bg {
+  width: 200px;
+  height: 8px;
+  background: #333;
+  border-radius: 4px;
+  margin: 10px auto 0;
+  overflow: hidden;
+}
+
+#tea-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--sage-green);
+  transition: width 1s linear;
 }
 
 #tarot-layer {
   z-index: 30;
   background-color: #000;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
 }
 
 #tarot-bg {
@@ -327,9 +380,7 @@ body, html {
   transform-style: preserve-3d;
 }
 
-.tarot-card.flipped .card-inner {
-  transform: rotateY(180deg);
-}
+.tarot-card.flipped .card-inner { transform: rotateY(180deg); }
 
 .card-back, .card-front {
   width: 100%;
