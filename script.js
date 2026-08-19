@@ -1,22 +1,97 @@
 // --- STATE MANAGEMENT ---
 let echoes = 0;
 let echoesPerSecond = 0;
+let totalInteractions = 0; // Tracks clicks to fill drift
+let liminalDrift = 0; // 0 to 100
+let isCheckpointActive = false;
 
-// --- FLEETING THOUGHTS LIST ---
-const moteThoughts = [
-  "Nobody's home",
-  "You left it open",
-  "Inside your skin",
-  "Past the hallway",
-  "A ticking clock",
-  "Flickering static",
-  "Forgotten names",
-  "Cold tea",
-  "Light blue dust",
-  "Soft whispers"
+// --- PSYCHOLOGICAL PATH TRACKING ---
+let paths = {
+  threshold: 0,
+  attachment: 0,
+  void: 0
+};
+
+// --- DOM REFERENCES ---
+const backgroundLayer = document.getElementById('background-layer');
+const moteContainer = document.getElementById('mote-container');
+const crystalOrb = document.getElementById('crystal-orb');
+const echoCountDisplay = document.getElementById('echo-count');
+const echoRateDisplay = document.getElementById('echo-rate');
+const driftBarFill = document.getElementById('drift-bar-fill');
+const shopItemsContainer = document.getElementById('shop-items');
+const btnTarot = document.getElementById('btn-tarot-reading');
+
+const dialogueOverlay = document.getElementById('dialogue-overlay');
+const dialogueText = document.getElementById('dialogue-text');
+const dialogueChoices = document.getElementById('dialogue-choices');
+const teaTimerOverlay = document.getElementById('tea-timer-overlay');
+const teaBarFill = document.getElementById('tea-bar-fill');
+
+const cardFlipAudio = new Audio('assets/cardflip.mp3');
+const gameplayAudio = new Audio('assets/gameplay.mp3');
+// Optional audio: const teaChime = new Audio('assets/teatimer.mp3');
+
+// --- THE CHECKPOINTS DATA ---
+const checkpoints = [
+  {
+    trigger: 15,
+    completed: false,
+    dialogue: "You've been tapping away at those motes for a while now. Here... take a break. It's chamomile, even if it doesn't taste like much. Sometimes you just have to sit still in the quiet before your hands cramp up. Don't worry, the stardust isn't going anywhere.",
+    choices: [
+      { text: "Accept the tea.", path: "attachment", action: "startTea" },
+      { text: "Politely decline and look away.", path: "void", followUp: "No? Ah... keeping your hands empty. I understand. Some people prefer not to leave fingerprints." }
+    ]
+  },
+  {
+    trigger: 35,
+    completed: false,
+    dialogue: "If you could trap just one tiny memory inside a glass jar to carry with you forever, what kind of memory would it be?",
+    choices: [
+      { text: "The exact sound of rain hitting a windowpane when I had nowhere else to be.", path: "attachment" },
+      { text: "A puzzle I solved once that made the whole world click into place for a second.", path: "threshold" },
+      { text: "An afternoon where I forgot my own name and felt completely light.", path: "void" }
+    ]
+  },
+  {
+    trigger: 55,
+    completed: false,
+    dialogue: "Something just moved in the corner of the ceiling. When you feel someone watching you from an empty room, what is your first instinct?",
+    choices: [
+      { text: "Look right back to see what rules of physics they're breaking.", path: "threshold", nextPart: true },
+      { text: "Hope it's someone I miss coming back to check on me.", path: "attachment", nextPart: true },
+      { text: "Ignore them completely. If I don't look, they can't anchor me here.", path: "void", nextPart: true }
+    ],
+    part2: {
+      dialogue: "And... do you think they're lonely, or are we the ones interrupting them?",
+      choices: [
+        { text: "We're all just passing through the same walls, aren't we?", path: "threshold" },
+        { text: "They're lonely. That's why they stay close to the doors.", path: "attachment" },
+        { text: "There's no difference between us and them anymore.", path: "void" }
+      ]
+    }
+  },
+  {
+    trigger: 75,
+    completed: false,
+    dialogue: "As we walk through these halls, we pick up things without realizing it—habits, names, regrets. Do your pockets feel heavier now than when you first started clicking?",
+    choices: [
+      { text: "Yes, but every fragment I carry teaches me something new about where I am.", path: "threshold" },
+      { text: "Extremely heavy. I'm afraid if I drop anything, I'll forget who I was.", path: "attachment" },
+      { text: "My pockets are empty. I left everything behind miles ago.", path: "void" }
+    ]
+  },
+  {
+    trigger: 90,
+    completed: false,
+    dialogue: "Look at you... you're practically glowing with all those collected fragments. You've changed since you first wandered down this hallway, you know. Your silhouette looks softer... or maybe you're just starting to blend into the wallpaper. The deck is shuffling itself on the desk. Whenever you're ready, tell me you want the reading, and we'll see what the cards have to say about the path you've carved.",
+    choices: [
+      { text: "I'm ready.", path: null, action: "unlockTarot" }
+    ]
+  }
 ];
 
-// --- SHOP UPGRADE DEFINITIONS (TIERS 1 - 3) ---
+// --- SHOP UPGRADES ---
 const shopItems = [
   { id: 'hourglass', name: 'Hourglass Shard', cost: 15, income: 1, count: 0, icon: 'assets/item-hourglass.png' },
   { id: 'polaroid', name: 'Fading Polaroid', cost: 75, income: 3, count: 0, icon: 'assets/item-polaroid.png' },
@@ -28,17 +103,13 @@ const shopItems = [
   { id: 'pillow', name: 'Ghost Cat Pillow', cost: 85000, income: 1200, count: 0, icon: 'assets/item-pillow.png' }
 ];
 
-// --- DOM REFERENCES ---
-const backgroundLayer = document.getElementById('background-layer');
-const moteContainer = document.getElementById('mote-container');
-const crystalOrb = document.getElementById('crystal-orb');
-const echoCountDisplay = document.getElementById('echo-count');
-const echoRateDisplay = document.getElementById('echo-rate');
-const shopItemsContainer = document.getElementById('shop-items');
-const cardFlipAudio = new Audio('assets/cardflip.mp3');
-const gameplayAudio = new Audio('assets/gameplay.mp3');
+// --- MOTES & THOUGHTS ---
+const moteThoughts = [
+  "Nobody's home", "You left it open", "Inside your skin", "Not your face", 
+  "Forgotten name", "Is this real?", "Fading out", "Whose voice?", "Keep walking"
+];
 
-// --- DYNAMIC DAY/NIGHT CYCLE ---
+// --- CORE FUNCTIONS ---
 function updateTimeOfDay() {
   const currentHour = new Date().getHours();
   const isDay = currentHour >= 6 && currentHour < 18;
@@ -47,13 +118,24 @@ function updateTimeOfDay() {
 updateTimeOfDay();
 setInterval(updateTimeOfDay, 60000);
 
-// --- ACTIVE CLICKING: ORB ---
+function increaseDrift() {
+  if (isCheckpointActive || liminalDrift >= 100) return;
+  
+  // Slowly fills up. Adjust this math to make the game longer/shorter!
+  liminalDrift += 0.5; 
+  if (liminalDrift > 100) liminalDrift = 100;
+  
+  driftBarFill.style.width = `${liminalDrift}%`;
+  checkTriggers();
+}
+
 crystalOrb.addEventListener('click', (e) => {
+  if(isCheckpointActive) return;
   addEchoes(1);
+  increaseDrift();
   triggerOrbJump();
   playRapidAudio(gameplayAudio, 0.4);
   createRipple(e.clientX, e.clientY);
-  spawnFloatingText(e.clientX, e.clientY, "+1");
 });
 
 function triggerOrbJump() {
@@ -62,13 +144,12 @@ function triggerOrbJump() {
   crystalOrb.classList.add('jumping');
 }
 
-// --- MOTE SPAWN ENGINE ---
 function spawnMote() {
+  if(isCheckpointActive) return;
+
   const mote = document.createElement('img');
   mote.src = 'assets/mote.png';
   mote.className = 'floating-mote';
-
-  // Random placement within interactive screen bounds
   const x = Math.random() * (window.innerWidth - 60) + 30;
   const y = Math.random() * (window.innerHeight * 0.45) + 60;
   mote.style.left = `${x}px`;
@@ -78,28 +159,22 @@ function spawnMote() {
     e.stopPropagation();
     const gain = Math.max(2, Math.floor(echoesPerSecond * 0.5) + 2);
     addEchoes(gain);
+    increaseDrift();
+    increaseDrift(); // Motes give double drift progress!
     playRapidAudio(gameplayAudio, 0.5);
-
     createRipple(e.clientX, e.clientY);
+    
     const thought = moteThoughts[Math.floor(Math.random() * moteThoughts.length)];
-    spawnFloatingText(e.clientX, e.clientY, `${thought} (+${gain})`);
-
+    spawnFloatingText(e.clientX, e.clientY, `${thought}`);
     mote.remove();
   });
 
   moteContainer.appendChild(mote);
-
-  // Auto-remove unclicked motes after 10s
-  setTimeout(() => {
-    if (mote.parentNode) {
-      mote.remove();
-    }
-  }, 10000);
+  setTimeout(() => { if (mote.parentNode) mote.remove(); }, 10000);
 }
-
 setInterval(spawnMote, 4500);
 
-// --- VISUAL EFFECTS HELPERS ---
+// --- VISUAL FX ---
 function createRipple(x, y) {
   const ripple = document.createElement('div');
   ripple.className = 'ripple';
@@ -125,7 +200,7 @@ function playRapidAudio(audioObj, volume = 0.5) {
   sound.play().catch(() => {});
 }
 
-// --- ECONOMY & SHOP SYSTEM ---
+// --- ECONOMY ---
 function addEchoes(amount) {
   echoes += amount;
   updateUI();
@@ -152,26 +227,25 @@ function renderShop() {
         <div class="item-count">Owned: ${item.count}</div>
       </div>
     `;
-
     itemEl.addEventListener('click', () => buyShopItem(index));
     shopItemsContainer.appendChild(itemEl);
   });
 }
 
 function buyShopItem(index) {
+  if (isCheckpointActive) return;
   const item = shopItems[index];
   if (echoes >= item.cost) {
     echoes -= item.cost;
     item.count += 1;
-    item.cost = Math.floor(item.cost * 1.18); // 18% price scale
+    item.cost = Math.floor(item.cost * 1.18);
     calculateEchoRate();
     updateUI();
   }
 }
 
-// Passive income tick: 10 times a second for fluid progress
 setInterval(() => {
-  if (echoesPerSecond > 0) {
+  if (echoesPerSecond > 0 && !isCheckpointActive) {
     echoes += echoesPerSecond / 10;
     updateUI();
   }
@@ -179,29 +253,92 @@ setInterval(() => {
 
 function updateUI() {
   echoCountDisplay.innerText = Math.floor(echoes);
-  
-  // Refresh disabled status on shop buttons efficiently
-  const shopElements = document.querySelectorAll('.shop-item');
-  shopElements.forEach((el, index) => {
-    if (echoes >= shopItems[index].cost) {
-      el.classList.remove('disabled');
-    } else {
-      el.classList.add('disabled');
-    }
-  });
+  renderShop(); // Re-render to update states/costs visually
 }
 
-// --- TAROT CARD FLIP LISTENERS ---
-document.querySelectorAll('.tarot-card').forEach(card => {
-  card.addEventListener('click', () => {
-    if (!card.classList.contains('flipped')) {
-      playRapidAudio(cardFlipAudio, 0.6);
-      card.classList.add('flipped');
-    }
-  });
-});
+// --- CHECKPOINT SYSTEM ---
+function checkTriggers() {
+  const pending = checkpoints.find(cp => !cp.completed && liminalDrift >= cp.trigger);
+  if (pending) {
+    isCheckpointActive = true;
+    displayCheckpoint(pending);
+  }
+}
 
-// Initial load render
+function displayCheckpoint(cp) {
+  dialogueText.innerText = cp.dialogue;
+  dialogueChoices.innerHTML = '';
+
+  cp.choices.forEach(choice => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.innerText = choice.text;
+    btn.onclick = () => handleChoice(choice, cp);
+    dialogueChoices.appendChild(btn);
+  });
+
+  dialogueOverlay.classList.remove('hidden');
+}
+
+function handleChoice(choice, cp) {
+  // Add path points
+  if (choice.path) {
+    paths[choice.path] += 1;
+  }
+
+  // Handle Part 2 of Checkpoint 3
+  if (choice.nextPart && cp.part2) {
+    displayCheckpoint(cp.part2);
+    return;
+  }
+
+  // Handle immediate dialogue follow ups (like declining tea)
+  if (choice.followUp) {
+    dialogueText.innerText = choice.followUp;
+    dialogueChoices.innerHTML = '';
+    setTimeout(() => closeCheckpoint(cp), 3000);
+    return;
+  }
+
+  // Handle special actions
+  if (choice.action === "startTea") {
+    dialogueOverlay.classList.add('hidden');
+    startTeaTimer(cp);
+    return;
+  }
+
+  if (choice.action === "unlockTarot") {
+    btnTarot.classList.remove('hidden');
+  }
+
+  closeCheckpoint(cp);
+}
+
+function closeCheckpoint(cp) {
+  if(cp) cp.completed = true;
+  dialogueOverlay.classList.add('hidden');
+  setTimeout(() => { isCheckpointActive = false; }, 500); // Small delay to prevent accidental clicks
+}
+
+// --- TEA TIMER ---
+function startTeaTimer(cp) {
+  teaTimerOverlay.classList.remove('hidden');
+  teaBarFill.style.width = '0%';
+  
+  // Force reflow
+  void teaBarFill.offsetWidth; 
+  
+  // Animate CSS to 100% over 15 seconds
+  teaBarFill.style.transition = 'width 15s linear';
+  teaBarFill.style.width = '100%';
+
+  setTimeout(() => {
+    teaTimerOverlay.classList.add('hidden');
+    // if (typeof teaChime !== 'undefined') teaChime.play();
+    closeCheckpoint(cp);
+  }, 15000);
+}
+
+// --- INITIALIZE ---
 calculateEchoRate();
-renderShop();
 updateUI();
