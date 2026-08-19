@@ -25,7 +25,7 @@
 
     <!-- LAYER 4: The User Interface -->
     <div id="ui-layer" class="layer">
-        <!-- Top HUD: Drift Meter & Currency -->
+        <!-- Top HUD: Drift Meter & Currency (Now Side-by-Side) -->
         <div id="top-hud">
             <div id="drift-container">
                 <div id="drift-label">Liminal Drift</div>
@@ -43,7 +43,10 @@
         <!-- Ask for Reading Button (Hidden until 90%) -->
         <button id="btn-tarot-reading" class="hidden">Ask for the Reading</button>
 
-        <!-- Bottom HUD: Shop -->
+        <!-- The Floating Shop Button -->
+        <button id="shop-toggle-btn">Open Machine</button>
+
+        <!-- Bottom HUD: Shop (Hidden off-screen by default) -->
         <div id="shop-container">
             <h3>The Aether Machine</h3>
             <div class="shop-grid" id="shop-items">
