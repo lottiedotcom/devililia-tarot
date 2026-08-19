@@ -14,6 +14,10 @@ const driftBarFill = document.getElementById('drift-bar-fill');
 const shopItemsContainer = document.getElementById('shop-items');
 const btnTarot = document.getElementById('btn-tarot-reading');
 
+// --- NEW MOBILE SHOP TOGGLE VARIABLES ---
+const shopToggleBtn = document.getElementById('shop-toggle-btn');
+const shopContainer = document.getElementById('shop-container');
+
 const dialogueOverlay = document.getElementById('dialogue-overlay');
 const dialogueText = document.getElementById('dialogue-text');
 const dialogueChoices = document.getElementById('dialogue-choices');
@@ -99,6 +103,16 @@ const moteThoughts = [
   "Nobody's home", "You left it open", "Inside your skin", "Not your face", 
   "Forgotten name", "Is this real?", "Fading out", "Whose voice?", "Keep walking"
 ];
+
+// --- MOBILE SHOP TOGGLE LOGIC ---
+shopToggleBtn.addEventListener('click', () => {
+  shopContainer.classList.toggle('open');
+  if (shopContainer.classList.contains('open')) {
+    shopToggleBtn.innerText = 'Close Machine';
+  } else {
+    shopToggleBtn.innerText = 'Open Machine';
+  }
+});
 
 function updateTimeOfDay() {
   const currentHour = new Date().getHours();
@@ -332,9 +346,11 @@ btnTarot.addEventListener('click', () => {
   tarotAudio.volume = 0.5;
   tarotAudio.play().catch(() => {});
 
+  // Hide everything including the new shop toggle button
   document.getElementById('ui-layer').classList.add('hidden');
   document.getElementById('mote-container').classList.add('hidden');
   document.getElementById('desk-layer').classList.add('hidden');
+  shopToggleBtn.classList.add('hidden'); 
   tarotLayer.classList.remove('hidden');
 
   generateTarotReading();
