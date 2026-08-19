@@ -1,3 +1,4 @@
+
 let echoes = 0;
 let echoesPerSecond = 0;
 let liminalDrift = 0; 
@@ -70,7 +71,7 @@ musicToggleBtn.addEventListener('click', () => {
   }
 });
 
-// --- HOURLY CHIME LOGIC WITH COUNTDOWN ---
+// --- HOURLY CHIME LOGIC (NOW 15 SECONDS) ---
 function checkHourlyChime() {
   const now = new Date();
   if (now.getMinutes() === 0 && now.getSeconds() === 0 && !isChimeActive) {
@@ -102,7 +103,7 @@ function triggerHourlyChime() {
     chimeParticlesContainer.appendChild(sparkle);
   }
 
-  let timeLeft = 10;
+  let timeLeft = 15; // Updated to 15 seconds!
   chimeTimerDisplay.innerText = timeLeft;
   
   clearInterval(chimeCountdownInterval);
@@ -127,7 +128,7 @@ function triggerHourlyChime() {
     }
     
     isChimeActive = false;
-  }, 10000); 
+  }, 15000); // Wait 15000ms (15 seconds)
 }
 
 // --- RECURRING TEA TIME LOGIC ---
@@ -261,6 +262,7 @@ function triggerOrbJump() {
   crystalOrb.classList.add('jumping');
 }
 
+// --- GLIDING MOTE LOGIC ---
 function spawnMote() {
   if(isCheckpointActive || isChimeActive) return;
 
@@ -272,10 +274,11 @@ function spawnMote() {
   const isTrapped = Math.random() < 0.15;
   if (isTrapped) mote.classList.add('trapped-mote');
 
-  const x = Math.random() * (window.innerWidth - 90) + 30; 
-  const y = Math.random() * (window.innerHeight * 0.45) + 60;
-  mote.style.left = `${x}px`;
-  mote.style.top = `${y}px`;
+  // Spawn lower down on the screen
+  const startX = Math.random() * (window.innerWidth - 90); 
+  const startY = window.innerHeight * 0.7; 
+  mote.style.left = `${startX}px`;
+  mote.style.top = `${startY}px`;
 
   let holdTimer;
 
@@ -303,6 +306,17 @@ function spawnMote() {
   mote.addEventListener('pointercancel', cancelHold);
 
   moteContainer.appendChild(mote);
+
+  // Force the browser to render the mote at the bottom before moving it
+  void mote.offsetWidth;
+
+  // Calculate a drift destination (moving upwards and sideways)
+  const endX = startX + ((Math.random() > 0.5 ? 1 : -1) * (Math.random() * 300 + 100)); 
+  const endY = -100; // Float completely off the top of the screen
+  
+  mote.style.left = `${endX}px`;
+  mote.style.top = `${endY}px`;
+
   setTimeout(() => { if (mote.parentNode) mote.remove(); }, 12000);
 }
 
@@ -381,15 +395,25 @@ function renderShop() {
   });
 }
 
+// --- FIXED SHOP UI UPDATE ---
 function buyShopItem(index) {
   if (isCheckpointActive || isChimeActive) return;
   const item = shopItems[index];
   if (echoes >= item.cost) {
     echoes -= item.cost;
     item.count += 1;
-    item.cost = Math.floor(item.cost * 1.23);
+    item.cost = Math.floor(item.cost * 1.23); // Core math works!
+    
     calculateEchoRate();
     updateUI();
+    
+    // Explicitly update the text of this specific item in the menu
+    const shopItemElements = document.querySelectorAll('.shop-item');
+    const costDisplay = shopItemElements[index].querySelector('.item-cost');
+    const countDisplay = shopItemElements[index].querySelector('.item-count');
+    
+    if (costDisplay) costDisplay.innerText = `${item.cost} Echoes`;
+    if (countDisplay) countDisplay.innerText = `Owned: ${item.count}`;
   }
 }
 
@@ -564,4 +588,3 @@ document.querySelectorAll('.tarot-card').forEach(card => {
 calculateEchoRate();
 renderShop();
 updateUI();
-
