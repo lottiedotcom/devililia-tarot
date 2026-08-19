@@ -38,7 +38,6 @@ tarotAudio.loop = true;
 tarotAudio.volume = 0.5;
 
 // --- AUDIO AUTOPLAY FIX ---
-// This listens for ANY touch or click on the screen to bypass browser blocks
 let isAudioStarted = false;
 function initAudio() {
   if (!isAudioStarted) {
@@ -72,23 +71,20 @@ function startTeaTimerInterval() {
   clearInterval(teaInterval);
   teaInterval = setInterval(() => {
     if (!isCheckpointActive) triggerTeaTime();
-  }, 15 * 60 * 1000); // 15 minutes in milliseconds
+  }, 15 * 60 * 1000); // 15 minutes
 }
-
-// Start the 15-minute clock when the game loads
 startTeaTimerInterval();
 
 // --- STORY CHECKPOINTS ---
-// Notice the first tea checkpoint is removed from here since it's handled dynamically above!
 const checkpoints = [
   {
     trigger: 35,
     completed: false,
-    dialogue: "If you could trap just one tiny memory inside a glass jar to carry with you forever, what kind of memory would it be?",
+    dialogue: "Have you noticed the air in here? It smells exactly like a waiting room from when you were seven. The kind where the magazines are peeling back and the hum of the lights makes your teeth ache.",
     choices: [
-      { text: "The exact sound of rain hitting a windowpane when I had nowhere else to be.", path: "attachment" },
-      { text: "A puzzle I solved once that made the whole world click into place for a second.", path: "threshold" },
-      { text: "An afternoon where I forgot my own name and felt completely light.", path: "void" }
+      { text: "I remember the pattern on the chairs. I used to trace it so I wouldn't have to look up.", path: "attachment" },
+      { text: "I've wondered if the clock moves, but i dont think it ever did.", path: "threshold" },
+      { text: "I don't smell much, I stopped breathing through my nose a few miles back.", path: "void" }
     ]
   },
   {
@@ -162,10 +158,9 @@ function updateTimeOfDay() {
 updateTimeOfDay();
 setInterval(updateTimeOfDay, 60000);
 
-// --- DRIFT PACING SLOWED DOWN BY 10x ---
 function increaseDrift() {
   if (isCheckpointActive || liminalDrift >= 100) return;
-  liminalDrift += 0.05; // Changed from 0.5 to make milestones take much longer!
+  liminalDrift += 0.05; 
   if (liminalDrift > 100) liminalDrift = 100;
   driftBarFill.style.width = `${liminalDrift}%`;
   checkTriggers();
@@ -237,11 +232,10 @@ function addEchoes(amount) {
   echoes += amount;
   updateUI();
 
-  // Trigger first tea time at 500 echoes!
   if (!firstTeaTriggered && echoes >= 500 && !isCheckpointActive) {
     firstTeaTriggered = true;
     triggerTeaTime();
-    startTeaTimerInterval(); // Reset the 15m timer so they don't get double tea
+    startTeaTimerInterval(); 
   }
 }
 
@@ -288,7 +282,6 @@ setInterval(() => {
     echoes += echoesPerSecond / 10;
     updateUI();
 
-    // Catch passive income triggering the 500 milestone
     if (!firstTeaTriggered && echoes >= 500) {
       firstTeaTriggered = true;
       triggerTeaTime();
@@ -452,4 +445,3 @@ document.querySelectorAll('.tarot-card').forEach(card => {
 calculateEchoRate();
 renderShop();
 updateUI();
-
