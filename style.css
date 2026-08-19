@@ -1,0 +1,362 @@
+/* --- PALETTE & BASE CONFIGURATION --- */
+:root {
+  --plum: #8e5572;
+  --plum-dark: #5c3549;
+  --light-blue: #a2d2ff;
+  --soft-pink: #ffcbf2;
+  --sage-green: #b5c99a;
+  --ui-bg: rgba(142, 85, 114, 0.88);
+  --ui-card-bg: rgba(92, 53, 73, 0.75);
+  --text-color: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body, html {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  font-family: "Courier New", Courier, monospace;
+  background-color: #000000;
+  color: var(--text-color);
+}
+
+/* --- LAYER MANAGEMENT --- */
+.layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Dynamic Background */
+#background-layer {
+  background-size: cover;
+  background-position: center;
+  z-index: 1;
+  transition: background-image 1.5s ease-in-out;
+}
+
+/* Character & Desk Setup */
+#desk-layer {
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+#desk-image {
+  width: 100%;
+  max-width: 580px;
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* Interactive Clicker Layer */
+#mote-container {
+  z-index: 5;
+  pointer-events: auto;
+  position: relative;
+  overflow: hidden;
+}
+
+#crystal-orb {
+  position: absolute;
+  bottom: 27%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 130px;
+  height: auto;
+  cursor: pointer;
+  z-index: 6;
+}
+
+/* Orb Jump Keyframes */
+@keyframes orb-jump {
+  0% { transform: translateX(-50%) translateY(0) scale(1); }
+  45% { transform: translateX(-50%) translateY(-22px) scale(1.06); }
+  100% { transform: translateX(-50%) translateY(0) scale(1); }
+}
+
+.jumping {
+  animation: orb-jump 0.16s ease-out;
+}
+
+/* Mote Floating Particles */
+.floating-mote {
+  position: absolute;
+  width: 38px;
+  height: 38px;
+  cursor: pointer;
+  z-index: 7;
+  pointer-events: auto;
+  animation: mote-float 4.5s ease-in-out infinite alternate;
+}
+
+@keyframes mote-float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(15deg); }
+  100% { transform: translateY(6px) rotate(-15deg); }
+}
+
+/* Ripple Explosion Effect */
+.ripple {
+  position: absolute;
+  width: 56px;
+  height: 56px;
+  background-image: url('assets/ripple.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none;
+  z-index: 8;
+  animation: ripple-pop 0.45s ease-out forwards;
+}
+
+@keyframes ripple-pop {
+  0% { transform: translate(-50%, -50%) scale(0.3); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
+}
+
+/* Fleeting Thought Floating Text */
+.fleeting-thought {
+  position: absolute;
+  color: var(--soft-pink);
+  font-size: 13px;
+  font-weight: bold;
+  pointer-events: none;
+  z-index: 9;
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.9);
+  animation: float-fade 1.8s ease-out forwards;
+  white-space: nowrap;
+}
+
+@keyframes float-fade {
+  0% { transform: translate(-50%, 0); opacity: 1; }
+  100% { transform: translate(-50%, -45px); opacity: 0; }
+}
+
+/* --- HUD & UI ELEMENTS --- */
+#ui-layer {
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px;
+  pointer-events: none;
+}
+
+#currency-display {
+  background-color: var(--ui-bg);
+  border: 2px solid var(--light-blue);
+  border-radius: 14px;
+  padding: 12px 24px;
+  color: var(--text-color);
+  text-align: center;
+  width: fit-content;
+  margin: 0 auto;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+#currency-display h2 {
+  font-size: 20px;
+  letter-spacing: 1px;
+}
+
+#echo-rate {
+  font-size: 13px;
+  color: var(--soft-pink);
+  margin-top: 2px;
+}
+
+/* --- SHOP PANEL --- */
+#shop-container {
+  background-color: var(--ui-bg);
+  border: 2px solid var(--light-blue);
+  border-radius: 18px 18px 0 0;
+  padding: 14px;
+  pointer-events: auto;
+  max-height: 38vh;
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(8px);
+}
+
+#shop-container h3 {
+  text-align: center;
+  color: var(--light-blue);
+  margin-bottom: 10px;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.shop-grid {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 4px;
+}
+
+.shop-grid::-webkit-scrollbar {
+  width: 5px;
+}
+
+.shop-grid::-webkit-scrollbar-thumb {
+  background: var(--light-blue);
+  border-radius: 4px;
+}
+
+.shop-item {
+  display: flex;
+  align-items: center;
+  background: var(--ui-card-bg);
+  border: 1px solid rgba(162, 210, 255, 0.4);
+  border-radius: 10px;
+  padding: 8px 12px;
+  gap: 12px;
+  cursor: pointer;
+  transition: transform 0.1s, border-color 0.2s, background-color 0.2s;
+}
+
+.shop-item:active {
+  transform: scale(0.98);
+}
+
+.shop-item.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.shop-item img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.item-info {
+  flex-grow: 1;
+}
+
+.item-name {
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+.item-stats {
+  font-size: 11px;
+  color: var(--sage-green);
+}
+
+.item-cost-box {
+  text-align: right;
+}
+
+.item-cost {
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--soft-pink);
+}
+
+.item-count {
+  font-size: 10px;
+  color: var(--light-blue);
+}
+
+/* --- TAROT SCENE --- */
+.hidden {
+  display: none !important;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#tarot-layer {
+  z-index: 30;
+  background-color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#tarot-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+}
+
+#card-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  gap: 12px;
+  z-index: 31;
+  pointer-events: auto;
+}
+
+.tarot-card {
+  width: 95px;
+  height: 155px;
+  perspective: 1000px;
+  cursor: pointer;
+}
+
+.card-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.tarot-card.flipped .card-inner {
+  transform: rotateY(180deg);
+}
+
+.card-back, .card-front {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  backface-visibility: hidden;
+  border-radius: 8px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7);
+}
+
+.card-back {
+  background-image: url('assets/card-back.png');
+  background-size: cover;
+  background-position: center;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.card-front {
+  background-color: var(--plum-dark);
+  color: var(--light-blue);
+  transform: rotateY(180deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8px;
+  font-weight: bold;
+  font-size: 12px;
+  border: 2px solid var(--soft-pink);
+}
