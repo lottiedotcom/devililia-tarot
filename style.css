@@ -49,6 +49,81 @@ body, html {
   transition: background-image 1.5s ease-in-out;
 }
 
+/* --- ROOM SCRAPBOOK ITEMS --- */
+#room-items-layer {
+  z-index: 3;
+  pointer-events: auto;
+}
+
+.room-item {
+  position: absolute;
+  object-fit: contain;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.room-item:active {
+  transform: scale(0.95);
+}
+
+#room-clock {
+  top: 22%;
+  left: 12%;
+  width: 55px;
+}
+
+#room-mirror {
+  top: 30%;
+  right: 15%;
+  width: 55px;
+}
+
+#room-polaroid {
+  top: 47%;
+  right: 14%;
+  width: 48px;
+  transform: rotate(5deg);
+}
+
+#room-letter {
+  bottom: 22%;
+  left: 48%;
+  transform: translateX(-50%);
+  width: 50px;
+  z-index: 4;
+}
+
+#room-hourglass {
+  bottom: 34%;
+  left: 31%;
+  width: 40px;
+  z-index: 4;
+}
+
+#room-moontear {
+  top: 48%;
+  left: 33%;
+  width: 35px;
+  animation: moontear-glow 3s infinite alternate ease-in-out;
+}
+
+@keyframes moontear-glow {
+  0% { filter: drop-shadow(0 0 2px var(--light-blue)); }
+  100% { filter: drop-shadow(0 0 10px var(--soft-pink)); }
+}
+
+#room-tv {
+  bottom: 8%;
+  left: 10%;
+  width: 75px;
+}
+
+#room-pillow {
+  bottom: 6%;
+  right: 12%;
+  width: 80px;
+}
+
 #desk-layer {
   z-index: 2;
   display: flex;
@@ -93,7 +168,6 @@ body, html {
   animation: orb-jump 0.16s ease-out;
 }
 
-/* --- GLIDING MOTES WITH CSS TRANSITION --- */
 .floating-mote {
   position: absolute;
   width: 90px; 
@@ -103,10 +177,7 @@ body, html {
   pointer-events: auto;
   touch-action: none;
   -webkit-touch-callout: none;
-  
-  /* CSS handles the bobbing and spinning... */
   animation: mote-bob 4s ease-in-out infinite alternate;
-  /* ...while this handles gliding across the screen! */
   transition: left 12s linear, top 12s linear; 
 }
 
@@ -115,7 +186,6 @@ body, html {
   100% { transform: translateY(-20px) rotate(15deg); }
 }
 
-/* THE TRAPPED MOTE EFFECTS */
 .trapped-mote {
   filter: hue-rotate(270deg) drop-shadow(0 0 8px rgba(142, 85, 114, 0.8));
   animation: trapped-shake 0.3s infinite alternate !important;
@@ -420,8 +490,8 @@ body, html {
 .tea-container { text-align: center; }
 
 #tea-icon {
-  width: 100px;
-  margin-bottom: 20px;
+  width: 80px;
+  margin-bottom: 15px;
   animation: mote-bob 3s infinite alternate ease-in-out;
 }
 
@@ -569,4 +639,3 @@ body, html {
   80% { opacity: 0.7; }
   100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
 }
-
