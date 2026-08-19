@@ -25,11 +25,8 @@
 
     <!-- LAYER 4: The User Interface -->
     <div id="ui-layer" class="layer">
-        
-        <!-- NEW: Tiny Music Toggle Button in Top Right -->
         <button id="music-toggle-btn">🔇</button>
 
-        <!-- Top HUD: Drift Meter & Currency (Side-by-Side) -->
         <div id="top-hud">
             <div id="drift-container">
                 <div id="drift-label">Liminal Drift</div>
@@ -44,13 +41,10 @@
             </div>
         </div>
 
-        <!-- Ask for Reading Button (Hidden until 90%) -->
         <button id="btn-tarot-reading" class="hidden">Ask for the Reading</button>
 
-        <!-- The Floating Shop Button -->
         <button id="shop-toggle-btn">Open Machine</button>
 
-        <!-- Bottom HUD: Shop (Hidden off-screen by default) -->
         <div id="shop-container">
             <h3>The Aether Machine</h3>
             <div class="shop-grid" id="shop-items">
@@ -78,7 +72,13 @@
         </div>
     </div>
 
-    <!-- LAYER 7: The Tarot Reading -->
+    <!-- LAYER 7: Hourly Chime Overlay (UPDATED FOR CLOCKBG) -->
+    <div id="chime-overlay" class="layer hidden">
+        <div id="chime-particles"></div>
+        <div id="chime-timer">10</div>
+    </div>
+
+    <!-- LAYER 8: The Tarot Reading -->
     <div id="tarot-layer" class="layer hidden">
         <img src="assets/top-viewoftable.png" id="tarot-bg" alt="Top view of table">
         <div id="card-container">
