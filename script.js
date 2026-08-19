@@ -39,31 +39,23 @@ let chimeCountdownInterval;
 
 // --- AUDIO SETUP ---
 const cardFlipAudio = new Audio('assets/cardflip.mp3');
-
 const gameplayAudio = new Audio('assets/gameplay.mp3');
 gameplayAudio.volume = 0.5;
-
 const teatimerAudio = new Audio('assets/teatimer.mp3');
 teatimerAudio.volume = 0.6;
-
 const tarotAudio = new Audio('assets/tarotgameplay.mp3');
 tarotAudio.volume = 0.5;
-
 const chimeAudio = new Audio('assets/chime.mp3');
 chimeAudio.volume = 0.9;
-
 const tvOnAudio = new Audio('assets/tvon.mp3');
 tvOnAudio.loop = true;
 tvOnAudio.volume = 0.3;
-
 const tvCh1Audio = new Audio('assets/tvch1.mp3');
 tvCh1Audio.loop = true;
 tvCh1Audio.volume = 0.4;
-
 const tvDefaultOnAudio = new Audio('assets/tvdefaulton.mp3');
 const tvDefaultOffAudio = new Audio('assets/tvdefaultoff.mp3');
 
-// --- AUDIO LOOPING ---
 [gameplayAudio, tarotAudio].forEach(audio => {
   audio.addEventListener('ended', function() {
     this.currentTime = 0;
@@ -269,6 +261,7 @@ function increaseDrift() {
   checkTriggers();
 }
 
+// Ensure the main orb doesn't trigger mobile context menus
 crystalOrb.addEventListener('contextmenu', (e) => e.preventDefault());
 crystalOrb.addEventListener('click', (e) => {
   if(isCheckpointActive || isChimeActive) return;
@@ -498,7 +491,7 @@ loreCloseBtn.addEventListener('click', () => {
   loreOverlay.classList.add('hidden');
 });
 
-// CRITICAL FIX: Pure pointer logic exactly like the motes
+// CRITICAL FIX: Replaced chaotic logic with pure pointerdown identical to the motes
 function setupRoomItem(elementId, loreKey, tapCallback) {
   const el = document.getElementById(elementId);
   if (!el) return;
@@ -506,22 +499,21 @@ function setupRoomItem(elementId, loreKey, tapCallback) {
   let holdTimer;
   let isHolding = false;
 
+  // Stop phone from saving image
   el.addEventListener('contextmenu', (e) => {
     e.preventDefault();
   });
 
   el.addEventListener('pointerdown', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
     if (isCheckpointActive || isChimeActive) return;
     
     isHolding = false;
     
-    // Exact 500ms timer
+    // Hold for 450ms to open lore
     holdTimer = setTimeout(() => {
       isHolding = true;
       showLore(loreKey, el.src); 
-    }, 500); 
+    }, 450); 
   });
 
   const cancelHold = () => {
@@ -531,13 +523,13 @@ function setupRoomItem(elementId, loreKey, tapCallback) {
   el.addEventListener('pointerup', (e) => {
     clearTimeout(holdTimer);
     
+    // If you let go before 450ms, it counts as a tap!
     if (!isHolding && tapCallback) {
       tapCallback(e); 
     }
-    
-    setTimeout(() => { isHolding = false; }, 50); 
   });
 
+  // Cancel hold if finger slides off the item
   el.addEventListener('pointerleave', cancelHold);
   el.addEventListener('pointercancel', cancelHold);
 }
@@ -612,6 +604,7 @@ setupRoomItem('room-hourglass', 'hourglass', () => {
   spawnFloatingText(document.getElementById('room-hourglass').getBoundingClientRect().left, document.getElementById('room-hourglass').getBoundingClientRect().top - 20, "Time slows.");
 });
 
+// Items without quick tap actions, just lore holds
 setupRoomItem('room-polaroid', 'polaroid', null);
 setupRoomItem('room-moontear', 'moontear', null);
 setupRoomItem('room-clock', 'clock', null);
