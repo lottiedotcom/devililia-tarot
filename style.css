@@ -49,7 +49,7 @@ body, html {
   transition: background-image 1.5s ease-in-out;
 }
 
-/* --- ROOM SCRAPBOOK ITEMS --- */
+/* --- ROOM SCRAPBOOK ITEMS (DEBUGGED PLACEMENTS) --- */
 #room-items-layer {
   z-index: 3;
   pointer-events: auto;
@@ -73,13 +73,16 @@ body, html {
   transform: scale(0.95);
 }
 
-#room-clock { top: 22%; left: 12%; width: 65px; }
+/* CLOCK: Centered in the top-left blue circle */
+#room-clock { top: 21%; left: 8%; width: 85px; }
+
 #room-mirror { top: 30%; right: 14%; width: 65px; }
 #room-polaroid { top: 42%; right: 11%; width: 85px; transform: rotate(5deg); }
-#room-letter { bottom: 22%; left: 48%; transform: translateX(-50%); width: 60px; z-index: 4; }
-#room-hourglass { bottom: 27%; left: 15%; width: 85px; z-index: 4; }
 
-/* MOVED OVER TO LEFT WINDOW SILL */
+/* LETTER: Placed down on the front center edge of the desk (bottom blue circle) */
+#room-letter { bottom: 33%; left: 49%; transform: translateX(-50%); width: 65px; z-index: 4; }
+
+#room-hourglass { bottom: 27%; left: 15%; width: 85px; z-index: 4; }
 #room-moontear { top: 47%; left: 23%; width: 45px; animation: moontear-glow 3s infinite alternate ease-in-out; }
 
 @keyframes moontear-glow {
@@ -87,8 +90,8 @@ body, html {
   100% { filter: drop-shadow(0 0 10px var(--soft-pink)); }
 }
 
-/* MOVED DOWN TO THE FLOOR */
-#room-tv { bottom: 2%; left: 4%; width: 85px; }
+/* TV: Moved to bottom right floor to balance the ghost pillow */
+#room-tv { bottom: 2%; right: 6%; width: 85px; }
 #room-pillow { bottom: 6%; right: 12%; width: 95px; }
 
 #desk-layer {
@@ -367,7 +370,7 @@ body, html {
   transition: opacity 0.4s;
 }
 
-.dialogue-box, .lore-box {
+.dialogue-box {
   background-color: var(--ui-bg);
   border: 3px solid var(--light-blue);
   border-radius: 12px;
