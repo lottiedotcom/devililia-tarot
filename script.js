@@ -1,4 +1,4 @@
-let echoes = 0;
+let echoes = 99999; // DEBUG MODE: Start with massive echoes
 let echoesPerSecond = 0;
 let liminalDrift = 0; 
 let isCheckpointActive = false;
@@ -41,28 +41,21 @@ let chimeCountdownInterval;
 const cardFlipAudio = new Audio('assets/cardflip.mp3');
 const gameplayAudio = new Audio('assets/gameplay.mp3');
 gameplayAudio.volume = 0.5;
-
 const teatimerAudio = new Audio('assets/teatimer.mp3');
 teatimerAudio.volume = 0.6;
-
 const tarotAudio = new Audio('assets/tarotgameplay.mp3');
 tarotAudio.volume = 0.5;
-
 const chimeAudio = new Audio('assets/chime.mp3');
 chimeAudio.volume = 0.9;
-
 const tvOnAudio = new Audio('assets/tvon.mp3');
 tvOnAudio.loop = true;
 tvOnAudio.volume = 0.3;
-
 const tvCh1Audio = new Audio('assets/tvch1.mp3');
 tvCh1Audio.loop = true;
 tvCh1Audio.volume = 0.4;
-
 const tvDefaultOnAudio = new Audio('assets/tvdefaulton.mp3');
 const tvDefaultOffAudio = new Audio('assets/tvdefaultoff.mp3');
 
-// --- AUDIO LOOPING ---
 [gameplayAudio, tarotAudio].forEach(audio => {
   audio.addEventListener('ended', function() {
     this.currentTime = 0;
@@ -498,7 +491,6 @@ loreCloseBtn.addEventListener('click', () => {
   loreOverlay.classList.add('hidden');
 });
 
-// CRITICAL FIX: Pure pointer logic exactly like the motes
 function setupRoomItem(elementId, loreKey, tapCallback) {
   const el = document.getElementById(elementId);
   if (!el) return;
@@ -509,8 +501,6 @@ function setupRoomItem(elementId, loreKey, tapCallback) {
   el.oncontextmenu = function(e) { e.preventDefault(); return false; };
 
   el.addEventListener('pointerdown', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
     if (isCheckpointActive || isChimeActive) return;
     
     isHolding = false;
@@ -611,6 +601,18 @@ setupRoomItem('room-polaroid', 'polaroid', null);
 setupRoomItem('room-moontear', 'moontear', null);
 setupRoomItem('room-clock', 'clock', null);
 setupRoomItem('room-pillow', 'pillow', null);
+
+
+// --- DEBUG MODE: AUTO-UNLOCK ALL ROOM ITEMS ON LOAD ---
+shopItems.forEach(item => {
+  item.count = 1; // Mark as owned
+  const el = document.getElementById(item.elementId);
+  if (el) el.classList.remove('hidden'); // Reveal on screen instantly
+});
+calculateEchoRate();
+updateUI();
+// ----------------------------------------------------
+
 
 setInterval(() => {
   if (echoesPerSecond > 0 && !isCheckpointActive && !isChimeActive) {
