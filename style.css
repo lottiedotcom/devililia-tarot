@@ -74,10 +74,10 @@ body, html {
 }
 
 /* CLOCK: Centered in the top-left blue circle */
-#room-clock { top: 21%; left: 8%; width: 85px; }
+#room-clock { top: 21%; left: 5%; width: 100px; }
 
-#room-mirror { top: 30%; right: 14%; width: 65px; }
-#room-polaroid { top: 42%; right: 11%; width: 85px; transform: rotate(5deg); }
+#room-mirror { top: 30%; right: 24%; width: 85px; }
+#room-polaroid { top: 42%; right: 13%; width: 95px; transform: rotate(5deg); }
 
 /* LETTER: Placed down on the front center edge of the desk (bottom blue circle) */
 #room-letter { bottom: 33%; left: 49%; transform: translateX(-50%); width: 65px; z-index: 4; }
