@@ -52,7 +52,7 @@ body, html {
 /* --- ROOM SCRAPBOOK ITEMS --- */
 #room-items-layer {
   z-index: 3;
-  pointer-events: auto; /* Lets taps through to items */
+  pointer-events: auto;
 }
 
 .room-item, .floating-mote, #crystal-orb {
@@ -78,14 +78,17 @@ body, html {
 #room-polaroid { top: 42%; right: 11%; width: 85px; transform: rotate(5deg); }
 #room-letter { bottom: 22%; left: 48%; transform: translateX(-50%); width: 60px; z-index: 4; }
 #room-hourglass { bottom: 27%; left: 15%; width: 85px; z-index: 4; }
-#room-moontear { top: 48%; left: 33%; width: 45px; animation: moontear-glow 3s infinite alternate ease-in-out; }
+
+/* MOVED OVER TO LEFT WINDOW SILL */
+#room-moontear { top: 47%; left: 23%; width: 45px; animation: moontear-glow 3s infinite alternate ease-in-out; }
 
 @keyframes moontear-glow {
   0% { filter: drop-shadow(0 0 2px var(--light-blue)); }
   100% { filter: drop-shadow(0 0 10px var(--soft-pink)); }
 }
 
-#room-tv { bottom: 8%; left: 10%; width: 85px; }
+/* MOVED DOWN TO THE FLOOR */
+#room-tv { bottom: 2%; left: 4%; width: 85px; }
 #room-pillow { bottom: 6%; right: 12%; width: 95px; }
 
 #desk-layer {
@@ -99,7 +102,6 @@ body, html {
 
 #mote-container {
   z-index: 5;
-  /* CRITICAL FIX: The invisible shield is gone! */
   pointer-events: none; 
   position: relative;
   width: 100%;
@@ -115,7 +117,7 @@ body, html {
   width: 200px; 
   cursor: pointer;
   z-index: 6;
-  pointer-events: auto; /* Orb still works */
+  pointer-events: auto;
 }
 
 @keyframes orb-jump {
@@ -132,7 +134,7 @@ body, html {
   height: auto;
   cursor: pointer;
   z-index: 7;
-  pointer-events: auto; /* Motes still work */
+  pointer-events: auto; 
   animation: mote-bob 4s ease-in-out infinite alternate;
   transition: left 12s linear, top 12s linear; 
 }
@@ -365,7 +367,7 @@ body, html {
   transition: opacity 0.4s;
 }
 
-.dialogue-box {
+.dialogue-box, .lore-box {
   background-color: var(--ui-bg);
   border: 3px solid var(--light-blue);
   border-radius: 12px;
@@ -376,7 +378,6 @@ body, html {
   text-align: center;
 }
 
-/* THE CUTE LORE BOX DESIGN */
 .lore-box {
   background-color: var(--ui-card-bg);
   border: 4px solid var(--soft-pink);
