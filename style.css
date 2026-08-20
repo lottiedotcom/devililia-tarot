@@ -74,7 +74,7 @@ body, html {
 }
 
 /* CLOCK: Centered in the top-left blue circle */
-#room-clock { top: 15%; left: 50%; width: 100px; }
+#room-clock { top: 15%; left: 5%; width: 100px; }
 
 #room-mirror { top: 24%; right: 12%; width: 85px; }
 #room-polaroid { top: 42%; right: 13%; width: 95px; transform: rotate(5deg); }
