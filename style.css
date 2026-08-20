@@ -76,7 +76,7 @@ body, html {
 /* CLOCK: Centered in the top-left blue circle */
 #room-clock { top: 28%; left: 9%; width: 100px; }
 
-#room-mirror { top: 30%; right: 24%; width: 85px; }
+#room-mirror { top: 24%; right: 12%; width: 85px; }
 #room-polaroid { top: 42%; right: 13%; width: 95px; transform: rotate(5deg); }
 
 /* LETTER: Placed down on the front center edge of the desk (bottom blue circle) */
