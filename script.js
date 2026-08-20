@@ -39,7 +39,6 @@ let chimeCountdownInterval;
 
 // --- AUDIO SETUP ---
 const cardFlipAudio = new Audio('assets/cardflip.mp3');
-
 const gameplayAudio = new Audio('assets/gameplay.mp3');
 gameplayAudio.volume = 0.5;
 
@@ -269,8 +268,9 @@ function increaseDrift() {
   checkTriggers();
 }
 
-crystalOrb.addEventListener('contextmenu', (e) => e.preventDefault());
-crystalOrb.addEventListener('click', (e) => {
+crystalOrb.oncontextmenu = function(e) { e.preventDefault(); return false; };
+
+crystalOrb.addEventListener('pointerdown', (e) => {
   if(isCheckpointActive || isChimeActive) return;
   addEchoes(1);
   increaseDrift();
@@ -291,7 +291,7 @@ function spawnMote() {
   mote.src = 'assets/mote.png';
   mote.className = 'floating-mote';
   mote.draggable = false; 
-  mote.addEventListener('contextmenu', (e) => e.preventDefault());
+  mote.oncontextmenu = function(e) { e.preventDefault(); return false; };
   
   const isTrapped = Math.random() < 0.15;
   if (isTrapped) mote.classList.add('trapped-mote');
@@ -509,6 +509,8 @@ function setupRoomItem(elementId, loreKey, tapCallback) {
   el.oncontextmenu = function(e) { e.preventDefault(); return false; };
 
   el.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (isCheckpointActive || isChimeActive) return;
     
     isHolding = false;
@@ -605,7 +607,6 @@ setupRoomItem('room-hourglass', 'hourglass', () => {
   spawnFloatingText(document.getElementById('room-hourglass').getBoundingClientRect().left, document.getElementById('room-hourglass').getBoundingClientRect().top - 20, "Time slows.");
 });
 
-// Items without quick tap actions, just lore holds
 setupRoomItem('room-polaroid', 'polaroid', null);
 setupRoomItem('room-moontear', 'moontear', null);
 setupRoomItem('room-clock', 'clock', null);
