@@ -76,11 +76,11 @@ body, html {
 /* CLOCK: Centered in the top-left blue circle */
 #room-clock { top: 15%; left: -7%; width: 120px; }
 
-#room-mirror { top: 24%; right: 22%; width: 85px; }
-#room-polaroid { top: 42%; right: 9%; width: 95px; transform: rotate(5deg); }
+#room-mirror { top: 24%; right: 2%; width: 85px; }
+#room-polaroid { top: 42%; right: 10%; width: 95px; transform: rotate(5deg); }
 
 /* LETTER: Placed down on the front center edge of the desk (bottom blue circle) */
-#room-letter { bottom: 33%; left: 49%; transform: translateX(-50%); width: 65px; z-index: 4; }
+#room-letter { bottom: 60%; left: 49%; transform: translateX(-50%); width: 65px; z-index: 4; }
 
 #room-hourglass { bottom: 27%; left: 15%; width: 85px; z-index: 4; }
 #room-moontear { top: 47%; left: 23%; width: 45px; animation: moontear-glow 3s infinite alternate ease-in-out; }
