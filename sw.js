@@ -1,18 +1,18 @@
-const CACHE_NAME = 'devililia-tarot-v16';
+const CACHE_NAME = 'devililia-tarot-v18';
 
 const urlsToCache = [
   './',
   './index.html',
   './style.css',
   './script.js',
-  './tarot-deck.js',           // NEW!
+  './tarot-deck.js',
   './manifest.json',
   './assets/orb.png',
   './assets/mote.png',
   './assets/ripple.png',
   './assets/day.png',
   './assets/night.png',
-  './assets/bedroom.png',      // NEW!
+  './assets/bedroom.png',
   './assets/deskwithorb.png',
   './assets/teacup.png',
   './assets/card-back.png',
@@ -45,37 +45,20 @@ const urlsToCache = [
 
 self.addEventListener('install', event => {
   self.skipWaiting();
-  
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        return cache.addAll(urlsToCache);
-      })
-  );
+  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)));
 });
 
 self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        return response || fetch(event.request);
-      })
-  );
+  event.respondWith(caches.match(event.request).then(response => response || fetch(event.request)));
 });
 
 self.addEventListener('activate', event => {
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    }).then(() => {
-      return self.clients.claim();
-    })
+    caches.keys().then(cacheNames => Promise.all(
+      cacheNames.map(cacheName => {
+        if (cacheWhitelist.indexOf(cacheName) === -1) return caches.delete(cacheName);
+      })
+    )).then(() => self.clients.claim())
   );
 });
