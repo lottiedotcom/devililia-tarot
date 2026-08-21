@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,9 +29,8 @@
         <img id="room-pillow" src="assets/item-pillow.png" class="room-item hidden" draggable="false" alt="Ghost Cat Pillow">
     </div>
 
-    <!-- LAYER 2: Devililia and the Desk -->
+    <!-- LAYER 2: Devililia and the Desk (RESTORED) -->
     <div id="desk-layer" class="layer">
-        <div id="dialogue-indicator" class="hidden">!</div>
         <img src="assets/deskwithorb.png" id="desk-image" draggable="false" alt="Devililia at her desk">
     </div>
 
@@ -41,6 +41,10 @@
 
     <!-- LAYER 4: The User Interface -->
     <div id="ui-layer" class="layer">
+        
+        <!-- SAFE PLACEMENT FOR DIALOGUE INDICATOR -->
+        <div id="dialogue-indicator" class="hidden">!</div>
+
         <button id="music-toggle-btn">🔇</button>
 
         <div id="top-hud">
@@ -128,7 +132,6 @@
         </div>
     </div>
 
-    <!-- TAROT DECK INCLUDED HERE -->
     <script src="tarot-deck.js"></script>
     <script src="script.js"></script>
     
@@ -139,4 +142,3 @@
     </script>
 </body>
 </html>
-
