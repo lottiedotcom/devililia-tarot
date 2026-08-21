@@ -52,7 +52,7 @@ body, html {
 /* --- ROOM SCRAPBOOK ITEMS --- */
 #room-items-layer {
   z-index: 3;
-  pointer-events: none; /* CRITICAL FIX: The glass wall is shattered! */
+  pointer-events: none; 
 }
 
 .room-item, .floating-mote, #crystal-orb {
@@ -67,7 +67,7 @@ body, html {
   object-fit: contain;
   cursor: pointer;
   transition: transform 0.2s;
-  pointer-events: auto; /* CRITICAL FIX: Only the items are clickable! */
+  pointer-events: auto; 
 }
 
 .room-item:active {
@@ -98,26 +98,26 @@ body, html {
 
 #desk-image { width: 100%; max-width: 580px; height: auto; object-fit: contain; pointer-events: auto; transition: filter 0.3s; }
 
-/* --- DARKER DIALOGUE INDICATOR (?) --- */
+/* --- BRIGHT GLOWING DIALOGUE INDICATOR (?) --- */
 #dialogue-indicator {
   position: absolute;
-  bottom: 60%; 
+  bottom: 55%; 
   left: 50%;
   transform: translateX(-50%);
-  font-size: 45px;
+  font-size: 65px; /* Massive so you can't miss it */
   font-weight: bold;
-  color: #1a0a14; /* Very dark plum/black */
-  text-shadow: 0 0 8px var(--plum-dark), 0 0 15px rgba(0,0,0,0.8); /* Dark shadow */
-  z-index: 15;
-  animation: mote-bob 2s ease-in-out infinite alternate;
-  pointer-events: auto; /* You can click the ? directly now too! */
+  color: var(--soft-pink); /* Bright pink */
+  text-shadow: 0 0 15px var(--light-blue), 0 0 30px var(--soft-pink); /* Blinding glow */
+  z-index: 100; /* Brought to the very front */
+  animation: mote-bob 1.5s ease-in-out infinite alternate;
+  pointer-events: auto; 
   cursor: pointer;
 }
 
-/* DARKER AURA WHEN READY TO TALK */
+/* BRIGHT PINK AURA WHEN READY TO TALK */
 .clickable-character {
   cursor: pointer;
-  filter: drop-shadow(0 0 12px rgba(26, 10, 20, 0.8)); /* Deep dark ominous shadow */
+  filter: drop-shadow(0 0 25px rgba(255, 203, 242, 1)); /* Bright pink character glow */
 }
 
 #mote-container {
