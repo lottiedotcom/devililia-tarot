@@ -1,5 +1,5 @@
-// DEBUG MODE OFF - Welcome to the real grind!
-let echoes = 999999; 
+//BUG MODE OFF 
+let echoes = 89999; 
 let echoesPerSecond = 0;
 let liminalDrift = 0; 
 let isCheckpointActive = false;
@@ -176,10 +176,14 @@ function startTeaTimerInterval() {
 }
 startTeaTimerInterval();
 
-// --- STORY CHECKPOINTS (Pushed Back!) ---
+
+// ==========================================
+// THE NEW MATH-BASED CHECKPOINTS!
+// 0.2 Drift per click. 500 clicks total.
+// ==========================================
 const checkpoints = [
   {
-    trigger: 40, // Increased from 35
+    trigger: 20, // Exactly 100 clicks in
     completed: false,
     dialogue: "Have you noticed the air in here? It smells exactly like a waiting room from when you were seven. The kind where the magazines are peeling back and the hum of the lights makes your teeth ache.",
     choices: [
@@ -189,7 +193,7 @@ const checkpoints = [
     ]
   },
   {
-    trigger: 70, // Increased from 55
+    trigger: 55, // Exactly 275 clicks in
     completed: false,
     dialogue: "Something just moved in the corner of the ceiling. When you feel someone watching you from an empty room, what is your first instinct?",
     choices: [
@@ -207,7 +211,7 @@ const checkpoints = [
     }
   },
   {
-    trigger: 95, // Increased from 75
+    trigger: 85, // Exactly 425 clicks in
     completed: false,
     dialogue: "As we walk through these halls, we pick up things without realizing it—habits, names, regrets. Do your pockets feel heavier now than when you first started clicking?",
     choices: [
@@ -254,11 +258,11 @@ updateTimeOfDay();
 setInterval(updateTimeOfDay, 60000);
 
 
-// --- THE NEW DRIFT PACING & TRIGGER CHECK ---
+// --- THE 0.2 DRIFT MATH ENGINE ---
 function increaseDrift() {
   if (isCheckpointActive || isTarotActive || isDialogueReady || liminalDrift >= 100) return;
   
-  liminalDrift += 0.03; // Back to the slow, atmospheric grind!
+  liminalDrift += 0.2; // Exactly 0.2% per click. 
   
   if (liminalDrift >= 100) {
     liminalDrift = 100;
