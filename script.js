@@ -5,7 +5,7 @@ let liminalDrift = 0;
 let isCheckpointActive = false;
 let isChimeActive = false; 
 let isTarotActive = false;
-let isDialogueReady = false; // The Alter Ego indicator tracker
+let isDialogueReady = false; 
 
 let paths = { threshold: 0, attachment: 0, void: 0 };
 
@@ -37,7 +37,8 @@ const loreText = document.getElementById('lore-text');
 const loreCloseBtn = document.getElementById('lore-close-btn');
 
 const musicToggleBtn = document.getElementById('music-toggle-btn');
-const deskImage = document.getElementById('desk-image'); // Devililia Image
+const deskImage = document.getElementById('desk-image');
+const dialogueIndicator = document.getElementById('dialogue-indicator');
 
 const chimeOverlay = document.getElementById('chime-overlay');
 const chimeTimerDisplay = document.getElementById('chime-timer');
@@ -99,11 +100,9 @@ setInterval(checkHourlyChime, 1000);
 
 function triggerHourlyChime() {
   isChimeActive = true;
-  
   backgroundLayer.classList.add('hourly-blur');
   deskLayer.classList.add('hourly-blur');
   moteContainer.classList.add('hourly-blur');
-
   chimeOverlay.classList.remove('hidden');
 
   if (isMusicPlaying) {
@@ -147,7 +146,6 @@ function triggerHourlyChime() {
     if (isMusicPlaying) {
       gameplayAudio.play().catch(()=>{});
     }
-    
     isChimeActive = false;
   }, 15000); 
 }
@@ -255,12 +253,12 @@ function updateTimeOfDay() {
 updateTimeOfDay();
 setInterval(updateTimeOfDay, 60000);
 
+
 // --- THE NEW DRIFT PACING & TRIGGER CHECK ---
 function increaseDrift() {
-  // Stop gaining drift if a menu is open OR if Devililia is waiting to talk to you
   if (isCheckpointActive || isTarotActive || isDialogueReady || liminalDrift >= 100) return;
   
-  liminalDrift += 0.05; // Restored normal pacing!
+  liminalDrift += 2.5; // (DEBUG SPEED!) 
   
   if (liminalDrift >= 100) {
     liminalDrift = 100;
@@ -275,44 +273,44 @@ function increaseDrift() {
 
 function checkTriggers() {
   const pending = checkpoints.find(cp => !cp.completed && liminalDrift >= cp.trigger);
-  // ALTER EGO APPROACH: Instead of opening dialogue, we queue it up on her!
   if (pending) {
     isDialogueReady = true;
-    document.getElementById('dialogue-indicator').classList.remove('hidden');
+    dialogueIndicator.classList.remove('hidden');
     deskImage.classList.add('clickable-character');
   }
 }
 
 // --- PLAYER-INITIATED DIALOGUE ---
-deskImage.addEventListener('pointerdown', (e) => {
+function triggerDialogue(e) {
   if (isDialogueReady && !isCheckpointActive && !isTarotActive) {
-    e.stopPropagation(); // Prevents clicking the orb through her
+    if (e) e.stopPropagation();
     isDialogueReady = false;
-    document.getElementById('dialogue-indicator').classList.add('hidden');
+    dialogueIndicator.classList.add('hidden');
     deskImage.classList.remove('clickable-character');
     
-    // Find the checkpoint she was holding
     const pending = checkpoints.find(cp => !cp.completed && liminalDrift >= cp.trigger);
     if (pending) {
       isCheckpointActive = true;
-      pending.completed = true; // Mark as done forever
+      pending.completed = true; 
       displayCheckpoint(pending);
     }
   }
-});
+}
+
+// You can click her face OR the question mark directly!
+deskImage.addEventListener('pointerdown', triggerDialogue);
+dialogueIndicator.addEventListener('pointerdown', triggerDialogue);
 
 
 // --- ROOM SWITCHING LOGIC ---
 function switchRoom(targetRoom) {
   currentRoom = targetRoom;
-  
   document.querySelectorAll('.room-item').forEach(el => el.classList.add('hidden'));
 
   if (targetRoom === 'main') {
     updateTimeOfDay(); 
     deskLayer.classList.remove('hidden');
     crystalOrb.classList.remove('hidden');
-    
     ['hourglass', 'polaroid', 'moontear', 'clock', 'mirror'].forEach(id => {
       let itemData = shopItems.find(i => i.id === id);
       if (itemData && itemData.count > 0) document.getElementById(itemData.elementId).classList.remove('hidden');
@@ -322,7 +320,6 @@ function switchRoom(targetRoom) {
     backgroundLayer.style.backgroundImage = "url('assets/bedroom.png')"; 
     deskLayer.classList.add('hidden');
     crystalOrb.classList.add('hidden');
-
     ['tv', 'pillow', 'letter', 'mirror'].forEach(id => {
       let itemData = shopItems.find(i => i.id === id);
       if (itemData && itemData.count > 0) document.getElementById(itemData.elementId).classList.remove('hidden');
@@ -345,7 +342,7 @@ function switchRoom(targetRoom) {
 crystalOrb.oncontextmenu = function(e) { e.preventDefault(); return false; };
 
 crystalOrb.addEventListener('pointerdown', (e) => {
-  if(isCheckpointActive || isChimeActive || isTarotActive || isDialogueReady) return;
+  if(isCheckpointActive || isChimeActive || isTarotActive) return; // Motes and Orb still work when she's waiting!
   addEchoes(1);
   increaseDrift();
   triggerOrbJump();
@@ -359,7 +356,7 @@ function triggerOrbJump() {
 }
 
 function spawnMote() {
-  if(isCheckpointActive || isChimeActive || isTarotActive || isDialogueReady) return;
+  if(isCheckpointActive || isChimeActive || isTarotActive) return; // Motes still spawn when she's waiting!
 
   const mote = document.createElement('img');
   mote.src = 'assets/mote.png';
@@ -383,9 +380,7 @@ function spawnMote() {
 
     if (isTrapped) {
       mote.classList.add('holding');
-      holdTimer = setTimeout(() => {
-        burstMote(e, mote, true); 
-      }, 500); 
+      holdTimer = setTimeout(() => { burstMote(e, mote, true); }, 500); 
     } else {
       burstMote(e, mote, false); 
     }
@@ -405,7 +400,6 @@ function spawnMote() {
 
   const endX = startX + ((Math.random() > 0.5 ? 1 : -1) * (Math.random() * 300 + 100)); 
   const endY = -100; 
-  
   mote.style.left = `${endX}px`;
   mote.style.top = `${endY}px`;
 
@@ -504,9 +498,7 @@ function buyShopItem(index) {
     
     if (item.elementId) {
       const roomElement = document.getElementById(item.elementId);
-      if (roomElement) {
-        switchRoom(currentRoom); 
-      }
+      if (roomElement) switchRoom(currentRoom); 
     }
   }
 }
@@ -564,9 +556,7 @@ function showLore(itemId, imageSrc) {
   loreOverlay.classList.remove('hidden');
 }
 
-loreCloseBtn.addEventListener('click', () => {
-  loreOverlay.classList.add('hidden');
-});
+loreCloseBtn.addEventListener('click', () => loreOverlay.classList.add('hidden'));
 
 function setupRoomItem(elementId, loreKey, tapCallback, holdCallback) {
   const el = document.getElementById(elementId);
@@ -592,15 +582,11 @@ function setupRoomItem(elementId, loreKey, tapCallback, holdCallback) {
     }, 450); 
   });
 
-  const cancelHold = () => {
-    clearTimeout(holdTimer);
-  };
+  const cancelHold = () => clearTimeout(holdTimer);
 
   el.addEventListener('pointerup', (e) => {
     clearTimeout(holdTimer);
-    if (!isHolding && tapCallback) {
-      tapCallback(e); 
-    }
+    if (!isHolding && tapCallback) tapCallback(e); 
   });
 
   el.addEventListener('pointerleave', cancelHold);
@@ -915,7 +901,6 @@ document.querySelectorAll('.tarot-card').forEach(card => {
 });
 
 // --- DEBUG INITIALIZATION BLOCK ---
-// Gives you items and money to test the layouts and dialogue instantly
 shopItems.forEach(item => { item.count = 1; });
 unlockedRooms.push('bedroom');
 renderShop(); 
