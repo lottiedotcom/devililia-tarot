@@ -1,4 +1,4 @@
-// DEBUG MODE IS ON
+// DEBUG MODE OFF - Welcome to the real grind!
 let echoes = 999999; 
 let echoesPerSecond = 0;
 let liminalDrift = 0; 
@@ -176,10 +176,10 @@ function startTeaTimerInterval() {
 }
 startTeaTimerInterval();
 
-// --- STORY CHECKPOINTS ---
+// --- STORY CHECKPOINTS (Pushed Back!) ---
 const checkpoints = [
   {
-    trigger: 35,
+    trigger: 40, // Increased from 35
     completed: false,
     dialogue: "Have you noticed the air in here? It smells exactly like a waiting room from when you were seven. The kind where the magazines are peeling back and the hum of the lights makes your teeth ache.",
     choices: [
@@ -189,7 +189,7 @@ const checkpoints = [
     ]
   },
   {
-    trigger: 55,
+    trigger: 70, // Increased from 55
     completed: false,
     dialogue: "Something just moved in the corner of the ceiling. When you feel someone watching you from an empty room, what is your first instinct?",
     choices: [
@@ -207,7 +207,7 @@ const checkpoints = [
     }
   },
   {
-    trigger: 75,
+    trigger: 95, // Increased from 75
     completed: false,
     dialogue: "As we walk through these halls, we pick up things without realizing it—habits, names, regrets. Do your pockets feel heavier now than when you first started clicking?",
     choices: [
@@ -258,7 +258,7 @@ setInterval(updateTimeOfDay, 60000);
 function increaseDrift() {
   if (isCheckpointActive || isTarotActive || isDialogueReady || liminalDrift >= 100) return;
   
-  liminalDrift += 2.5; // (DEBUG SPEED!) 
+  liminalDrift += 0.03; // Back to the slow, atmospheric grind!
   
   if (liminalDrift >= 100) {
     liminalDrift = 100;
@@ -297,7 +297,6 @@ function triggerDialogue(e) {
   }
 }
 
-// You can click her face OR the question mark directly!
 deskImage.addEventListener('pointerdown', triggerDialogue);
 dialogueIndicator.addEventListener('pointerdown', triggerDialogue);
 
@@ -342,7 +341,7 @@ function switchRoom(targetRoom) {
 crystalOrb.oncontextmenu = function(e) { e.preventDefault(); return false; };
 
 crystalOrb.addEventListener('pointerdown', (e) => {
-  if(isCheckpointActive || isChimeActive || isTarotActive) return; // Motes and Orb still work when she's waiting!
+  if(isCheckpointActive || isChimeActive || isTarotActive) return; 
   addEchoes(1);
   increaseDrift();
   triggerOrbJump();
@@ -356,7 +355,7 @@ function triggerOrbJump() {
 }
 
 function spawnMote() {
-  if(isCheckpointActive || isChimeActive || isTarotActive) return; // Motes still spawn when she's waiting!
+  if(isCheckpointActive || isChimeActive || isTarotActive) return; 
 
   const mote = document.createElement('img');
   mote.src = 'assets/mote.png';
@@ -900,9 +899,7 @@ document.querySelectorAll('.tarot-card').forEach(card => {
   });
 });
 
-// --- DEBUG INITIALIZATION BLOCK ---
-shopItems.forEach(item => { item.count = 1; });
-unlockedRooms.push('bedroom');
+// --- REAL GAME INITIALIZATION ---
 renderShop(); 
 calculateEchoRate();
 updateUI();
