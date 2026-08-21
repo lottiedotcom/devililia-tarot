@@ -1,5 +1,4 @@
-//BUG MODE OFF 
-let echoes = 89999; 
+let echoes = 999999; 
 let echoesPerSecond = 0;
 let liminalDrift = 0; 
 let isCheckpointActive = false;
@@ -9,7 +8,6 @@ let isDialogueReady = false;
 
 let paths = { threshold: 0, attachment: 0, void: 0 };
 
-// ROOM STATE MANAGEMENT
 let currentRoom = 'main'; 
 let unlockedRooms = ['main']; 
 
@@ -45,7 +43,6 @@ const chimeTimerDisplay = document.getElementById('chime-timer');
 const chimeParticlesContainer = document.getElementById('chime-particles');
 let chimeCountdownInterval;
 
-// --- AUDIO SETUP ---
 const cardFlipAudio = new Audio('assets/cardflip.mp3');
 const gameplayAudio = new Audio('assets/gameplay.mp3');
 gameplayAudio.volume = 0.5;
@@ -72,7 +69,6 @@ const tvDefaultOffAudio = new Audio('assets/tvdefaultoff.mp3');
   }, false);
 });
 
-// --- MUSIC TOGGLE LOGIC ---
 let isMusicPlaying = false;
 
 musicToggleBtn.addEventListener('click', () => {
@@ -89,7 +85,6 @@ musicToggleBtn.addEventListener('click', () => {
   }
 });
 
-// --- HOURLY CHIME LOGIC ---
 function checkHourlyChime() {
   const now = new Date();
   if (now.getMinutes() === 0 && now.getSeconds() === 0 && !isChimeActive) {
@@ -150,7 +145,6 @@ function triggerHourlyChime() {
   }, 15000); 
 }
 
-// --- RECURRING TEA TIME LOGIC ---
 let firstTeaTriggered = false;
 let teaInterval;
 
@@ -176,14 +170,10 @@ function startTeaTimerInterval() {
 }
 startTeaTimerInterval();
 
-
-// ==========================================
-// THE NEW MATH-BASED CHECKPOINTS!
-// 0.2 Drift per click. 500 clicks total.
-// ==========================================
+// EXACT MATH-BASED CHECKPOINTS
 const checkpoints = [
   {
-    trigger: 20, // Exactly 100 clicks in
+    trigger: 20, // 100 Clicks
     completed: false,
     dialogue: "Have you noticed the air in here? It smells exactly like a waiting room from when you were seven. The kind where the magazines are peeling back and the hum of the lights makes your teeth ache.",
     choices: [
@@ -193,7 +183,7 @@ const checkpoints = [
     ]
   },
   {
-    trigger: 55, // Exactly 275 clicks in
+    trigger: 55, // 275 Clicks
     completed: false,
     dialogue: "Something just moved in the corner of the ceiling. When you feel someone watching you from an empty room, what is your first instinct?",
     choices: [
@@ -211,7 +201,7 @@ const checkpoints = [
     }
   },
   {
-    trigger: 85, // Exactly 425 clicks in
+    trigger: 85, // 425 Clicks
     completed: false,
     dialogue: "As we walk through these halls, we pick up things without realizing it—habits, names, regrets. Do your pockets feel heavier now than when you first started clicking?",
     choices: [
@@ -257,12 +247,11 @@ function updateTimeOfDay() {
 updateTimeOfDay();
 setInterval(updateTimeOfDay, 60000);
 
-
-// --- THE 0.2 DRIFT MATH ENGINE ---
+// MATH SET TO 0.2
 function increaseDrift() {
   if (isCheckpointActive || isTarotActive || isDialogueReady || liminalDrift >= 100) return;
   
-  liminalDrift += 0.2; // Exactly 0.2% per click. 
+  liminalDrift += 0.2; 
   
   if (liminalDrift >= 100) {
     liminalDrift = 100;
@@ -277,17 +266,18 @@ function increaseDrift() {
 
 function checkTriggers() {
   const pending = checkpoints.find(cp => !cp.completed && liminalDrift >= cp.trigger);
-  if (pending) {
+  if (pending && !isDialogueReady) {
     isDialogueReady = true;
+    dialogueIndicator.innerText = '!'; // Ensure it's the Exclamation
     dialogueIndicator.classList.remove('hidden');
     deskImage.classList.add('clickable-character');
   }
 }
 
-// --- PLAYER-INITIATED DIALOGUE ---
-function triggerDialogue(e) {
+// ONLY THE ! IS CLICKABLE NOW
+dialogueIndicator.addEventListener('pointerdown', (e) => {
   if (isDialogueReady && !isCheckpointActive && !isTarotActive) {
-    if (e) e.stopPropagation();
+    e.stopPropagation();
     isDialogueReady = false;
     dialogueIndicator.classList.add('hidden');
     deskImage.classList.remove('clickable-character');
@@ -299,13 +289,8 @@ function triggerDialogue(e) {
       displayCheckpoint(pending);
     }
   }
-}
+});
 
-deskImage.addEventListener('pointerdown', triggerDialogue);
-dialogueIndicator.addEventListener('pointerdown', triggerDialogue);
-
-
-// --- ROOM SWITCHING LOGIC ---
 function switchRoom(targetRoom) {
   currentRoom = targetRoom;
   document.querySelectorAll('.room-item').forEach(el => el.classList.add('hidden'));
@@ -658,7 +643,6 @@ function triggerPortalPrompt(target, text) {
   dialogueOverlay.classList.remove('hidden');
 }
 
-
 const roomTv = document.getElementById('room-tv');
 let tvState = 0; 
 
@@ -692,7 +676,6 @@ setupRoomItem('room-tv', 'tv', () => {
     }
   }
 });
-
 
 setupRoomItem('room-letter', 'letter', 
   () => {
@@ -903,7 +886,6 @@ document.querySelectorAll('.tarot-card').forEach(card => {
   });
 });
 
-// --- REAL GAME INITIALIZATION ---
 renderShop(); 
 calculateEchoRate();
 updateUI();
