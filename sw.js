@@ -1,16 +1,18 @@
-const CACHE_NAME = 'devililia-tarot-v15';
+const CACHE_NAME = 'devililia-tarot-v16';
 
 const urlsToCache = [
   './',
   './index.html',
   './style.css',
   './script.js',
+  './tarot-deck.js',           // NEW!
   './manifest.json',
   './assets/orb.png',
   './assets/mote.png',
   './assets/ripple.png',
   './assets/day.png',
   './assets/night.png',
+  './assets/bedroom.png',      // NEW!
   './assets/deskwithorb.png',
   './assets/teacup.png',
   './assets/card-back.png',
