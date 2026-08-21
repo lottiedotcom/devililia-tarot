@@ -1,10 +1,11 @@
-// DEBUG MODE IS BACK ON
+// DEBUG MODE IS ON
 let echoes = 999999; 
 let echoesPerSecond = 0;
 let liminalDrift = 0; 
 let isCheckpointActive = false;
 let isChimeActive = false; 
 let isTarotActive = false;
+let isDialogueReady = false; // The Alter Ego indicator tracker
 
 let paths = { threshold: 0, attachment: 0, void: 0 };
 
@@ -36,6 +37,7 @@ const loreText = document.getElementById('lore-text');
 const loreCloseBtn = document.getElementById('lore-close-btn');
 
 const musicToggleBtn = document.getElementById('music-toggle-btn');
+const deskImage = document.getElementById('desk-image'); // Devililia Image
 
 const chimeOverlay = document.getElementById('chime-overlay');
 const chimeTimerDisplay = document.getElementById('chime-timer');
@@ -171,7 +173,7 @@ function triggerTeaTime() {
 function startTeaTimerInterval() {
   clearInterval(teaInterval);
   teaInterval = setInterval(() => {
-    if (!isCheckpointActive && !isChimeActive) triggerTeaTime();
+    if (!isCheckpointActive && !isChimeActive && !isDialogueReady) triggerTeaTime();
   }, 15 * 60 * 1000); 
 }
 startTeaTimerInterval();
@@ -253,10 +255,12 @@ function updateTimeOfDay() {
 updateTimeOfDay();
 setInterval(updateTimeOfDay, 60000);
 
+// --- THE NEW DRIFT PACING & TRIGGER CHECK ---
 function increaseDrift() {
-  if (isCheckpointActive || isTarotActive || liminalDrift >= 100) return;
+  // Stop gaining drift if a menu is open OR if Devililia is waiting to talk to you
+  if (isCheckpointActive || isTarotActive || isDialogueReady || liminalDrift >= 100) return;
   
-  liminalDrift += 0.03; 
+  liminalDrift += 0.05; // Restored normal pacing!
   
   if (liminalDrift >= 100) {
     liminalDrift = 100;
@@ -271,12 +275,32 @@ function increaseDrift() {
 
 function checkTriggers() {
   const pending = checkpoints.find(cp => !cp.completed && liminalDrift >= cp.trigger);
+  // ALTER EGO APPROACH: Instead of opening dialogue, we queue it up on her!
   if (pending) {
-    isCheckpointActive = true;
-    pending.completed = true; 
-    displayCheckpoint(pending);
+    isDialogueReady = true;
+    document.getElementById('dialogue-indicator').classList.remove('hidden');
+    deskImage.classList.add('clickable-character');
   }
 }
+
+// --- PLAYER-INITIATED DIALOGUE ---
+deskImage.addEventListener('pointerdown', (e) => {
+  if (isDialogueReady && !isCheckpointActive && !isTarotActive) {
+    e.stopPropagation(); // Prevents clicking the orb through her
+    isDialogueReady = false;
+    document.getElementById('dialogue-indicator').classList.add('hidden');
+    deskImage.classList.remove('clickable-character');
+    
+    // Find the checkpoint she was holding
+    const pending = checkpoints.find(cp => !cp.completed && liminalDrift >= cp.trigger);
+    if (pending) {
+      isCheckpointActive = true;
+      pending.completed = true; // Mark as done forever
+      displayCheckpoint(pending);
+    }
+  }
+});
+
 
 // --- ROOM SWITCHING LOGIC ---
 function switchRoom(targetRoom) {
@@ -321,7 +345,7 @@ function switchRoom(targetRoom) {
 crystalOrb.oncontextmenu = function(e) { e.preventDefault(); return false; };
 
 crystalOrb.addEventListener('pointerdown', (e) => {
-  if(isCheckpointActive || isChimeActive || isTarotActive) return;
+  if(isCheckpointActive || isChimeActive || isTarotActive || isDialogueReady) return;
   addEchoes(1);
   increaseDrift();
   triggerOrbJump();
@@ -335,7 +359,7 @@ function triggerOrbJump() {
 }
 
 function spawnMote() {
-  if(isCheckpointActive || isChimeActive || isTarotActive) return;
+  if(isCheckpointActive || isChimeActive || isTarotActive || isDialogueReady) return;
 
   const mote = document.createElement('img');
   mote.src = 'assets/mote.png';
@@ -430,7 +454,7 @@ function addEchoes(amount) {
   echoes += amount;
   updateUI();
 
-  if (!firstTeaTriggered && echoes >= 500 && !isCheckpointActive) {
+  if (!firstTeaTriggered && echoes >= 500 && !isCheckpointActive && !isDialogueReady) {
     firstTeaTriggered = true;
     triggerTeaTime();
     startTeaTimerInterval(); 
@@ -464,7 +488,7 @@ function renderShop() {
 }
 
 function buyShopItem(index) {
-  if (isCheckpointActive || isChimeActive) return;
+  if (isCheckpointActive || isChimeActive || isDialogueReady) return;
   const item = shopItems[index];
   if (echoes >= item.cost) {
     echoes -= item.cost;
@@ -477,7 +501,13 @@ function buyShopItem(index) {
     
     calculateEchoRate();
     updateUI();
-    switchRoom(currentRoom); 
+    
+    if (item.elementId) {
+      const roomElement = document.getElementById(item.elementId);
+      if (roomElement) {
+        switchRoom(currentRoom); 
+      }
+    }
   }
 }
 
@@ -548,7 +578,7 @@ function setupRoomItem(elementId, loreKey, tapCallback, holdCallback) {
   el.oncontextmenu = function(e) { e.preventDefault(); return false; };
 
   el.addEventListener('pointerdown', (e) => {
-    if (isCheckpointActive || isChimeActive) return;
+    if (isCheckpointActive || isChimeActive || isDialogueReady) return;
     
     isHolding = false;
     
@@ -724,7 +754,7 @@ setInterval(() => {
     echoes += echoesPerSecond / 10;
     updateUI();
 
-    if (!firstTeaTriggered && echoes >= 500) {
+    if (!firstTeaTriggered && echoes >= 500 && !isCheckpointActive && !isDialogueReady) {
       firstTeaTriggered = true;
       triggerTeaTime();
       startTeaTimerInterval();
@@ -885,9 +915,10 @@ document.querySelectorAll('.tarot-card').forEach(card => {
 });
 
 // --- DEBUG INITIALIZATION BLOCK ---
-// This runs on load so you can actually test your layouts!
+// Gives you items and money to test the layouts and dialogue instantly
 shopItems.forEach(item => { item.count = 1; });
 unlockedRooms.push('bedroom');
+renderShop(); 
 calculateEchoRate();
 updateUI();
 switchRoom('main'); 
