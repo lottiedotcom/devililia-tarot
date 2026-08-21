@@ -1,13 +1,5 @@
-// --- TAROT DECK FAILSAFE ---
-if (typeof tarotDeck === 'undefined') {
-    var tarotDeck = [
-        { name: "The Fool", past: "A leap of faith into the unknown.", present: "Falling through the static.", future: "A new loop begins." },
-        { name: "The Magician", past: "You found the seams in the wallpaper.", present: "Manipulating the echoes.", future: "You will build a door where there was a wall." },
-        { name: "The High Priestess", past: "A secret kept quiet.", present: "Listening to the hum of the lights.", future: "Trust your intuition in the dark." }
-    ];
-}
-
-let echoes = 99999; // DEBUG MODE: Massive starting echoes
+// DEBUG MODE IS BACK ON
+let echoes = 999999; 
 let echoesPerSecond = 0;
 let liminalDrift = 0; 
 let isCheckpointActive = false;
@@ -264,7 +256,7 @@ setInterval(updateTimeOfDay, 60000);
 function increaseDrift() {
   if (isCheckpointActive || isTarotActive || liminalDrift >= 100) return;
   
-  liminalDrift += 0.05; 
+  liminalDrift += 0.03; 
   
   if (liminalDrift >= 100) {
     liminalDrift = 100;
@@ -546,7 +538,6 @@ loreCloseBtn.addEventListener('click', () => {
   loreOverlay.classList.add('hidden');
 });
 
-// --- UNIFIED, SAFE ITEM SETUP LOGIC ---
 function setupRoomItem(elementId, loreKey, tapCallback, holdCallback) {
   const el = document.getElementById(elementId);
   if (!el) return;
@@ -599,12 +590,10 @@ const mirrorReflections = [
 let currentMirrorIndex = 0;
 
 setupRoomItem('room-mirror', 'mirror', 
-  // TAP Action
   () => {
     currentMirrorIndex = (currentMirrorIndex + 1) % mirrorReflections.length;
     roomMirror.src = mirrorReflections[currentMirrorIndex];
   },
-  // HOLD Action
   (currentSrc) => {
     if (currentSrc.includes('mirrorgirl.png')) {
       if (unlockedRooms.includes('bedroom')) {
@@ -687,11 +676,9 @@ setupRoomItem('room-tv', 'tv', () => {
 
 
 setupRoomItem('room-letter', 'letter', 
-  // TAP Action
   () => {
     spawnFloatingText(document.getElementById('room-letter').getBoundingClientRect().left, document.getElementById('room-letter').getBoundingClientRect().top - 20, "Waiting...");
   },
-  // HOLD Action
   () => {
     if (currentRoom === 'bedroom') {
        startLetterSequence();
@@ -727,8 +714,6 @@ function handleLetterCore() {
   }, 3000);
 }
 
-
-// Basic lore holds
 setupRoomItem('room-polaroid', 'polaroid', null);
 setupRoomItem('room-moontear', 'moontear', null);
 setupRoomItem('room-clock', 'clock', null);
@@ -899,17 +884,11 @@ document.querySelectorAll('.tarot-card').forEach(card => {
   });
 });
 
-// --- SAFE DEBUG MODE INITIALIZATION ---
-// This safely forces you to own all items and unhides them without crashing the shop logic
-shopItems.forEach(item => {
-  item.count = 1;
-});
-if (!unlockedRooms.includes('bedroom')) {
-  unlockedRooms.push('bedroom');
-}
-
+// --- DEBUG INITIALIZATION BLOCK ---
+// This runs on load so you can actually test your layouts!
+shopItems.forEach(item => { item.count = 1; });
+unlockedRooms.push('bedroom');
 calculateEchoRate();
-renderShop();
 updateUI();
 switchRoom('main'); 
 
