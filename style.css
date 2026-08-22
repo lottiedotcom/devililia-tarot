@@ -34,21 +34,7 @@ body, html { width: 100vw; height: 100vh; overflow: hidden; font-family: "Courie
 #desk-layer { z-index: 2; display: flex; align-items: flex-end; justify-content: center; }
 #desk-image { width: 100%; max-width: 580px; height: auto; object-fit: contain; transition: filter 0.3s; pointer-events: none; }
 
-#dialogue-indicator {
-  position: absolute;
-  bottom: 55%; 
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 70px; 
-  font-weight: bold;
-  color: var(--soft-pink); 
-  text-shadow: 0 0 15px var(--light-blue), 0 0 30px var(--soft-pink); 
-  z-index: 100; 
-  animation: mote-bob 1.5s ease-in-out infinite alternate;
-  pointer-events: auto; 
-  cursor: pointer;
-}
-
+#dialogue-indicator { position: absolute; bottom: 55%; left: 50%; transform: translateX(-50%); font-size: 70px; font-weight: bold; color: var(--soft-pink); text-shadow: 0 0 15px var(--light-blue), 0 0 30px var(--soft-pink); z-index: 100; animation: mote-bob 1.5s ease-in-out infinite alternate; pointer-events: auto; cursor: pointer; }
 .clickable-character { filter: drop-shadow(0 0 25px rgba(255, 203, 242, 1)); }
 
 #mote-container { z-index: 5; pointer-events: none; position: relative; width: 100%; height: 100%; overflow: hidden; }
@@ -117,29 +103,24 @@ body, html { width: 100vw; height: 100vh; overflow: hidden; font-family: "Courie
 #tea-bar-bg { width: 200px; height: 8px; background: #333; border-radius: 4px; margin: 10px auto 0; overflow: hidden; }
 #tea-bar-fill { height: 100%; width: 0%; background: var(--sage-green); transition: width 1s linear; }
 
-#tarot-layer { z-index: 30; background-color: #000; }
+/* NEW TAROT LAYER BACKGROUND SETTING */
+#tarot-layer { 
+  z-index: 30; 
+  background-image: url('assets/tablebg.png'); /* Now applies your custom background image! */
+  background-size: cover; 
+  background-position: top; 
+}
 #tarot-bg { width: 100%; height: 100%; object-fit: cover; position: absolute; }
 
-/* NEW TAROT DIALOGUE OVERLAY */
-#tarot-dialogue-box {
-  position: absolute;
-  top: 15%; 
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: var(--ui-card-bg);
-  border: 3px solid var(--soft-pink);
-  border-radius: 12px;
-  width: 85%;
-  max-width: 500px;
-  padding: 15px;
-  z-index: 35;
-  text-align: center;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.8);
-  backdrop-filter: blur(5px);
-}
-#tarot-dialogue-text { font-size: 14px; color: var(--text-color); font-style: italic; text-shadow: 0 0 5px var(--plum-dark); }
+/* NEW SHUFFLING OVERLAY ANIMATION */
+#shuffle-overlay { z-index: 40; background-color: rgba(0, 0, 0, 0.75); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.deck-shuffle { width: 75px; height: 125px; background-image: url('assets/card-back.png'); background-size: cover; border-radius: 8px; box-shadow: 0 0 25px var(--light-blue); border: 1px solid rgba(255,255,255,0.4); margin-bottom: 25px; animation: shuffle-anim 0.3s infinite alternate ease-in-out; }
+@keyframes shuffle-anim { 0% { transform: rotate(-8deg) translateX(-15px) translateY(-5px); } 100% { transform: rotate(8deg) translateX(15px) translateY(5px); } }
+.shuffle-text { color: var(--soft-pink); font-size: 18px; font-weight: bold; letter-spacing: 3px; text-shadow: 0 0 10px var(--light-blue); animation: pulse-timer 1s infinite alternate; }
 
-/* PUSHED CARDS DOWN ONTO THE TABLE */
+
+#tarot-dialogue-box { position: absolute; top: 15%; left: 50%; transform: translateX(-50%); background-color: var(--ui-card-bg); border: 3px solid var(--soft-pink); border-radius: 12px; width: 85%; max-width: 500px; padding: 15px; z-index: 35; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.8); backdrop-filter: blur(5px); }
+#tarot-dialogue-text { font-size: 14px; color: var(--text-color); font-style: italic; text-shadow: 0 0 5px var(--plum-dark); }
 #card-container { position: absolute; top: 68%; left: 50%; transform: translate(-50%, -50%); display: flex; gap: 15px; width: 100%; justify-content: center; z-index: 31; pointer-events: auto; }
 .tarot-card { width: 95px; height: 160px; perspective: 1000px; cursor: pointer; }
 .card-inner { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
@@ -147,22 +128,7 @@ body, html { width: 100vw; height: 100vh; overflow: hidden; font-family: "Courie
 .card-back, .card-front { width: 100%; height: 100%; position: absolute; backface-visibility: hidden; border-radius: 8px; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7); }
 .card-back { background-image: url('assets/card-back.png'); background-size: cover; background-position: center; border: 1px solid rgba(255, 255, 255, 0.3); }
 
-/* ADDED SCROLL BARS TO KEEP TEXT IN BOUNDS */
-.card-front { 
-  background-color: var(--plum-dark); 
-  color: var(--light-blue); 
-  transform: rotateY(180deg); 
-  display: flex; 
-  flex-direction: column;
-  align-items: center; 
-  justify-content: flex-start; 
-  text-align: center; 
-  padding: 10px 8px; 
-  font-weight: bold; 
-  font-size: 11px; 
-  border: 2px solid var(--soft-pink); 
-  overflow-y: auto; 
-}
+.card-front { background-color: var(--plum-dark); color: var(--light-blue); transform: rotateY(180deg); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; padding: 10px 8px; font-weight: bold; font-size: 11px; border: 2px solid var(--soft-pink); overflow-y: auto; }
 .card-front::-webkit-scrollbar { width: 4px; }
 .card-front::-webkit-scrollbar-track { background: transparent; }
 .card-front::-webkit-scrollbar-thumb { background: var(--soft-pink); border-radius: 4px; }
@@ -174,4 +140,3 @@ body, html { width: 100vw; height: 100vh; overflow: hidden; font-family: "Courie
 #chime-particles { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 41; pointer-events: none; overflow: hidden; }
 .chime-sparkle { position: absolute; width: 12px; height: 12px; background-color: var(--soft-pink); border-radius: 50%; box-shadow: 0 0 12px var(--light-blue); animation: float-up 3s linear infinite; opacity: 0; }
 @keyframes float-up { 0% { transform: translateY(100vh) scale(0.5); opacity: 0; } 20% { opacity: 0.7; } 80% { opacity: 0.7; } 100% { transform: translateY(-10vh) scale(1.5); opacity: 0; } }
-
