@@ -1,4 +1,4 @@
-let echoes = 999999; 
+let echoes = 99999; 
 let echoesPerSecond = 0;
 let liminalDrift = 0; 
 let isCheckpointActive = false;
@@ -170,10 +170,9 @@ function startTeaTimerInterval() {
 }
 startTeaTimerInterval();
 
-// EXACT MATH-BASED CHECKPOINTS
 const checkpoints = [
   {
-    trigger: 20, // 100 Clicks
+    trigger: 20, 
     completed: false,
     dialogue: "Have you noticed the air in here? It smells exactly like a waiting room from when you were seven. The kind where the magazines are peeling back and the hum of the lights makes your teeth ache.",
     choices: [
@@ -183,7 +182,7 @@ const checkpoints = [
     ]
   },
   {
-    trigger: 55, // 275 Clicks
+    trigger: 55, 
     completed: false,
     dialogue: "Something just moved in the corner of the ceiling. When you feel someone watching you from an empty room, what is your first instinct?",
     choices: [
@@ -201,7 +200,7 @@ const checkpoints = [
     }
   },
   {
-    trigger: 85, // 425 Clicks
+    trigger: 85, 
     completed: false,
     dialogue: "As we walk through these halls, we pick up things without realizing it—habits, names, regrets. Do your pockets feel heavier now than when you first started clicking?",
     choices: [
@@ -247,7 +246,6 @@ function updateTimeOfDay() {
 updateTimeOfDay();
 setInterval(updateTimeOfDay, 60000);
 
-// MATH SET TO 0.2
 function increaseDrift() {
   if (isCheckpointActive || isTarotActive || isDialogueReady || liminalDrift >= 100) return;
   
@@ -268,13 +266,12 @@ function checkTriggers() {
   const pending = checkpoints.find(cp => !cp.completed && liminalDrift >= cp.trigger);
   if (pending && !isDialogueReady) {
     isDialogueReady = true;
-    dialogueIndicator.innerText = '!'; // Ensure it's the Exclamation
+    dialogueIndicator.innerText = '!'; 
     dialogueIndicator.classList.remove('hidden');
     deskImage.classList.add('clickable-character');
   }
 }
 
-// ONLY THE ! IS CLICKABLE NOW
 dialogueIndicator.addEventListener('pointerdown', (e) => {
   if (isDialogueReady && !isCheckpointActive && !isTarotActive) {
     e.stopPropagation();
@@ -546,22 +543,26 @@ function showLore(itemId, imageSrc) {
 
 loreCloseBtn.addEventListener('click', () => loreOverlay.classList.add('hidden'));
 
+// BUG FIX: Added `tapAllowed` to prevent Mirror Portal from glitching!
 function setupRoomItem(elementId, loreKey, tapCallback, holdCallback) {
   const el = document.getElementById(elementId);
   if (!el) return;
 
   let holdTimer;
   let isHolding = false;
+  let tapAllowed = true;
 
   el.oncontextmenu = function(e) { e.preventDefault(); return false; };
 
   el.addEventListener('pointerdown', (e) => {
-    if (isCheckpointActive || isChimeActive || isDialogueReady) return;
+    if (isCheckpointActive || isChimeActive || isDialogueReady || isTarotActive) return;
     
     isHolding = false;
+    tapAllowed = true;
     
     holdTimer = setTimeout(() => {
       isHolding = true;
+      tapAllowed = false; // Lock out the tap cycle while holding
       if (holdCallback) {
         holdCallback(el.src);
       } else {
@@ -574,14 +575,13 @@ function setupRoomItem(elementId, loreKey, tapCallback, holdCallback) {
 
   el.addEventListener('pointerup', (e) => {
     clearTimeout(holdTimer);
-    if (!isHolding && tapCallback) tapCallback(e); 
+    // Extra safety: Don't allow tap if a checkpoint just opened!
+    if (tapAllowed && tapCallback && !isCheckpointActive) tapCallback(e); 
   });
 
   el.addEventListener('pointerleave', cancelHold);
   el.addEventListener('pointercancel', cancelHold);
 }
-
-// --- INTERACTIVE ROOM ITEMS SETUP ---
 
 const roomMirror = document.getElementById('room-mirror');
 const mirrorReflections = [
@@ -643,6 +643,7 @@ function triggerPortalPrompt(target, text) {
   dialogueOverlay.classList.remove('hidden');
 }
 
+
 const roomTv = document.getElementById('room-tv');
 let tvState = 0; 
 
@@ -702,18 +703,17 @@ function startLetterSequence() {
   });
 }
 
+// BUG FIX: Removed the massive delay that locked up the letter sequence!
 function handleLetterCore() {
-  setTimeout(() => {
-    isCheckpointActive = true;
-    displayCheckpoint({
-      dialogue: "What is the core of the message?",
-      choices: [
-        { text: "\"The walls are still made of paper.\"", followUp: "She writes about the architecture, as if the sender doesn't already know how thin the boundaries are here." },
-        { text: "\"I forgot what your voice sounded like.\"", followUp: "The hardest part isn't being alone; it's realizing you've memorized the silence instead of a name." },
-        { text: "\"I'm not coming back.\"", followUp: "A bold lie. The desk is still right where you left it." }
-      ]
-    });
-  }, 3000);
+  isCheckpointActive = true;
+  displayCheckpoint({
+    dialogue: "What is the core of the message?",
+    choices: [
+      { text: "\"The walls are still made of paper.\"", followUp: "She writes about the architecture, as if the sender doesn't already know how thin the boundaries are here." },
+      { text: "\"I forgot what your voice sounded like.\"", followUp: "The hardest part isn't being alone; it's realizing you've memorized the silence instead of a name." },
+      { text: "\"I'm not coming back.\"", followUp: "A bold lie. The desk is still right where you left it." }
+    ]
+  });
 }
 
 setupRoomItem('room-polaroid', 'polaroid', null);
@@ -761,6 +761,7 @@ function displayCheckpoint(cp) {
   dialogueOverlay.classList.remove('hidden');
 }
 
+// BUG FIX: Adjusted delays to prevent the letter race conditions
 function handleChoice(choice, cp) {
   if (choice.path) { paths[choice.path] += 1; }
 
@@ -775,10 +776,15 @@ function handleChoice(choice, cp) {
   if (choice.followUp) {
     dialogueText.innerText = choice.followUp;
     dialogueChoices.innerHTML = '';
+    
+    // Instantly transition if it's the letter logic to stop the freezing!
     setTimeout(() => {
-      closeCheckpoint(cp);
-      if(choice.action && choice.action.includes('letter')) handleLetterCore();
-    }, 3500);
+      if(choice.action && choice.action.includes('letter')) {
+          handleLetterCore(); 
+      } else {
+          closeCheckpoint(cp);
+      }
+    }, 2500);
     return;
   }
 
@@ -826,11 +832,17 @@ function startTeaTimer(cp) {
   }, 15000);
 }
 
-// --- TRUE TAROT ENGINE ---
+// --- TRUE TAROT ENGINE WITH BUG FIXES ---
 const tarotLayer = document.getElementById('tarot-layer');
 const card1Front = document.getElementById('card-1-front');
 const card2Front = document.getElementById('card-2-front');
 const card3Front = document.getElementById('card-3-front');
+
+// NEW UI ELEMENTS FOR DIALOGUE
+const tarotDialogueBox = document.getElementById('tarot-dialogue-box');
+const tarotDialogueText = document.getElementById('tarot-dialogue-text');
+
+let currentTarotDraw = []; 
 
 function triggerInfiniteTarot() {
   isTarotActive = true;
@@ -843,22 +855,28 @@ function triggerInfiniteTarot() {
 
   document.getElementById('ui-layer').classList.add('hidden');
   document.getElementById('mote-container').classList.add('hidden');
+  
+  // BUG FIX: We only hide the desk character, NOT the room items!
   document.getElementById('desk-layer').classList.add('hidden');
-  document.getElementById('room-items-layer').classList.add('hidden');
+  
   shopToggleBtn.classList.add('hidden'); 
   tarotLayer.classList.remove('hidden');
+  
+  // Hide dialogue box to start
+  tarotDialogueBox.classList.add('hidden');
+  tarotDialogueText.innerText = '';
 
   let shuffled = tarotDeck.sort(() => 0.5 - Math.random());
-  let draw = shuffled.slice(0, 3);
+  currentTarotDraw = shuffled.slice(0, 3);
   let dominantPath = Object.keys(paths).reduce((a, b) => paths[a] > paths[b] ? a : b);
 
   let pastIntro = dominantPath === "threshold" ? "You see the seams..." : dominantPath === "attachment" ? "Your pockets are heavy..." : "You are fading...";
   let presIntro = dominantPath === "threshold" ? "Manipulating the wiring..." : dominantPath === "attachment" ? "Holding onto ghosts..." : "Blending into the wallpaper...";
   let futIntro = dominantPath === "threshold" ? "A calculated exit..." : dominantPath === "attachment" ? "Leaving the key behind..." : "Total integration...";
 
-  card1Front.innerText = `${draw[0].name}\n\n[PAST]\n${draw[0].past}\n\n(${pastIntro})`;
-  card2Front.innerText = `${draw[1].name}\n\n[PRESENT]\n${draw[1].present}\n\n(${presIntro})`;
-  card3Front.innerText = `${draw[2].name}\n\n[FUTURE]\n${draw[2].future}\n\n(${futIntro})`;
+  card1Front.innerText = `${currentTarotDraw[0].name}\n\n[PAST]\n${currentTarotDraw[0].past}\n\n(${pastIntro})`;
+  card2Front.innerText = `${currentTarotDraw[1].name}\n\n[PRESENT]\n${currentTarotDraw[1].present}\n\n(${presIntro})`;
+  card3Front.innerText = `${currentTarotDraw[2].name}\n\n[FUTURE]\n${currentTarotDraw[2].future}\n\n(${futIntro})`;
 
   document.querySelectorAll('.tarot-card').forEach(card => card.classList.remove('flipped'));
 
@@ -866,16 +884,27 @@ function triggerInfiniteTarot() {
   driftBarFill.style.width = '0%';
 }
 
-document.querySelectorAll('.tarot-card').forEach(card => {
+document.querySelectorAll('.tarot-card').forEach((card, index) => {
   card.addEventListener('click', () => {
     if (!card.classList.contains('flipped')) {
       cardFlipAudio.cloneNode().play().catch(()=>{});
       card.classList.add('flipped');
+      
+      // TRIGGER THE NEW CHARACTER REACTION DIALOGUE!
+      tarotDialogueBox.classList.remove('hidden');
+      tarotDialogueText.innerText = currentTarotDraw[index].reaction || `She silently traces the edges of the ${currentTarotDraw[index].name}...`;
+      
     } else {
       let allFlipped = document.querySelectorAll('.tarot-card.flipped').length;
       if (allFlipped === 3) {
          document.getElementById('ui-layer').classList.remove('hidden');
          document.getElementById('tarot-layer').classList.add('hidden');
+         
+         // THE FIX: Unhide everything so items stay on table!
+         document.getElementById('mote-container').classList.remove('hidden');
+         document.getElementById('desk-layer').classList.remove('hidden');
+         document.getElementById('room-items-layer').classList.remove('hidden');
+
          shopToggleBtn.classList.remove('hidden');
          isTarotActive = false;
          tarotAudio.pause();
