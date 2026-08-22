@@ -1,10 +1,12 @@
-let echoes = 99999; 
+
+let echoes = 999999; 
 let echoesPerSecond = 0;
 let liminalDrift = 0; 
 let isCheckpointActive = false;
 let isChimeActive = false; 
 let isTarotActive = false;
 let isDialogueReady = false; 
+let isTarotPromptReady = false; // NEW FLAG FOR TAROT QUESTION
 
 let paths = { threshold: 0, attachment: 0, void: 0 };
 
@@ -165,7 +167,7 @@ function triggerTeaTime() {
 function startTeaTimerInterval() {
   clearInterval(teaInterval);
   teaInterval = setInterval(() => {
-    if (!isCheckpointActive && !isChimeActive && !isDialogueReady) triggerTeaTime();
+    if (!isCheckpointActive && !isChimeActive && !isDialogueReady && !isTarotPromptReady) triggerTeaTime();
   }, 15 * 60 * 1000); 
 }
 startTeaTimerInterval();
@@ -246,6 +248,7 @@ function updateTimeOfDay() {
 updateTimeOfDay();
 setInterval(updateTimeOfDay, 60000);
 
+// --- THE DRIFT LOGIC NOW WAITS FOR 100% ---
 function increaseDrift() {
   if (isCheckpointActive || isTarotActive || isDialogueReady || liminalDrift >= 100) return;
   
@@ -254,7 +257,12 @@ function increaseDrift() {
   if (liminalDrift >= 100) {
     liminalDrift = 100;
     driftBarFill.style.width = `100%`;
-    triggerInfiniteTarot(); 
+    // Set the prompt flags for Tarot!
+    isTarotPromptReady = true;
+    isDialogueReady = true;
+    dialogueIndicator.innerText = '!'; 
+    dialogueIndicator.classList.remove('hidden');
+    deskImage.classList.add('clickable-character');
     return;
   }
   
@@ -272,6 +280,7 @@ function checkTriggers() {
   }
 }
 
+// --- CLICK TO ANSWER DIALOGUES OR START TAROT ---
 dialogueIndicator.addEventListener('pointerdown', (e) => {
   if (isDialogueReady && !isCheckpointActive && !isTarotActive) {
     e.stopPropagation();
@@ -279,6 +288,19 @@ dialogueIndicator.addEventListener('pointerdown', (e) => {
     dialogueIndicator.classList.add('hidden');
     deskImage.classList.remove('clickable-character');
     
+    // Check if it's the final 100% Tarot mark
+    if (isTarotPromptReady) {
+      isCheckpointActive = true;
+      displayCheckpoint({
+        dialogue: "You look quite exhausted little one... . Would you like a tarot reading to see how you're feeling?",
+        choices: [
+          { text: "That would be really nice.. thank you..", path: "attachment", action: "startTarot" },
+          { text: "I don't feel like I need one, but sure.", path: "void", action: "startTarot" }
+        ]
+      });
+      return;
+    }
+
     const pending = checkpoints.find(cp => !cp.completed && liminalDrift >= cp.trigger);
     if (pending) {
       isCheckpointActive = true;
@@ -433,7 +455,7 @@ function addEchoes(amount) {
   echoes += amount;
   updateUI();
 
-  if (!firstTeaTriggered && echoes >= 500 && !isCheckpointActive && !isDialogueReady) {
+  if (!firstTeaTriggered && echoes >= 500 && !isCheckpointActive && !isDialogueReady && !isTarotPromptReady) {
     firstTeaTriggered = true;
     triggerTeaTime();
     startTeaTimerInterval(); 
@@ -488,48 +510,15 @@ function buyShopItem(index) {
   }
 }
 
-// --- ITEM LORE DATABASE ---
 const loreData = {
-  hourglass: [
-    "At a certain point you stop tracking the sand, the years seem to go by here... I wonder how long I've been here..",
-    "It doesn't measure time seemingly.. it measures something else.",
-    "I like to play with it in my free time, it's nice to step away from here sometimes to just, be there."
-  ],
-  polaroid: [
-    "I took this the day I arrived. My face looked different then.",
-    "I swear the Ink has made me look more depressed.. or maybe I've always been this way.",
-    "I looked so pretty here .. do I still?"
-  ],
-  letter: [
-    "The wax smells like roses from, back then... It leaves my head dizzy.",
-    "The seal is made of dried wax and something... colder.",
-    "I keep it closed. Some news is better off unread."
-  ],
-  moontear: [
-    "It fell from the moon during an eclipse. I put it in a jar to cherish it.",
-    "It smells like rain and old metal.",
-    "If you hold it to your ear, you can hear the ocean."
-  ],
-  clock: [
-    "Time feels like it only existed beyond these walls, when was that again?",
-    "I've started to wonder if it represents how long I've been here or the way I feel, maybe it's just me.",
-    "It’s stuck on the hour you arrived. Every single day."
-  ],
-  pillow: [
-    "It's cold, I wonder where Kalt is, she's a good cat.",
-    "Always smells of lavender and fresh bread.. she does make great biscuits.",
-    "It likes to curl up in the spaces where the light doesn't reach."
-  ],
-  tv: [
-    "Shhhh, my favorite show is on.",
-    "Sometimes, if you lean in close, you can hear yourself breathing on the other side.",
-    "I swear I didn't turn it off, did you?"
-  ],
-  mirror: [
-    "It's the only thing in the room that doesn't lie to me.",
-    "Did you see that? Or is my mind elsewhere again..",
-    "That hall is familiar, It haunts me in my dreams."
-  ]
+  hourglass: ["At a certain point you stop tracking the sand, the years seem to go by here... I wonder how long I've been here..", "It doesn't measure time seemingly.. it measures something else.", "I like to play with it in my free time, it's nice to step away from here sometimes to just, be there."],
+  polaroid: ["I took this the day I arrived. My face looked different then.", "I swear the Ink has made me look more depressed.. or maybe I've always been this way.", "I looked so pretty here .. do I still?"],
+  letter: ["The wax smells like roses from, back then... It leaves my head dizzy.", "The seal is made of dried wax and something... colder.", "I keep it closed. Some news is better off unread."],
+  moontear: ["It fell from the moon during an eclipse. I put it in a jar to cherish it.", "It smells like rain and old metal.", "If you hold it to your ear, you can hear the ocean."],
+  clock: ["Time feels like it only existed beyond these walls, when was that again?", "I've started to wonder if it represents how long I've been here or the way I feel, maybe it's just me.", "It’s stuck on the hour you arrived. Every single day."],
+  pillow: ["It's cold, I wonder where Kalt is, she's a good cat.", "Always smells of lavender and fresh bread.. she does make great biscuits.", "It likes to curl up in the spaces where the light doesn't reach."],
+  tv: ["Shhhh, my favorite show is on.", "Sometimes, if you lean in close, you can hear yourself breathing on the other side.", "I swear I didn't turn it off, did you?"],
+  mirror: ["It's the only thing in the room that doesn't lie to me.", "Did you see that? Or is my mind elsewhere again..", "That hall is familiar, It haunts me in my dreams."]
 };
 
 function showLore(itemId, imageSrc) {
@@ -543,7 +532,6 @@ function showLore(itemId, imageSrc) {
 
 loreCloseBtn.addEventListener('click', () => loreOverlay.classList.add('hidden'));
 
-// BUG FIX: Added `tapAllowed` to prevent Mirror Portal from glitching!
 function setupRoomItem(elementId, loreKey, tapCallback, holdCallback) {
   const el = document.getElementById(elementId);
   if (!el) return;
@@ -562,7 +550,7 @@ function setupRoomItem(elementId, loreKey, tapCallback, holdCallback) {
     
     holdTimer = setTimeout(() => {
       isHolding = true;
-      tapAllowed = false; // Lock out the tap cycle while holding
+      tapAllowed = false; 
       if (holdCallback) {
         holdCallback(el.src);
       } else {
@@ -575,7 +563,6 @@ function setupRoomItem(elementId, loreKey, tapCallback, holdCallback) {
 
   el.addEventListener('pointerup', (e) => {
     clearTimeout(holdTimer);
-    // Extra safety: Don't allow tap if a checkpoint just opened!
     if (tapAllowed && tapCallback && !isCheckpointActive) tapCallback(e); 
   });
 
@@ -584,13 +571,7 @@ function setupRoomItem(elementId, loreKey, tapCallback, holdCallback) {
 }
 
 const roomMirror = document.getElementById('room-mirror');
-const mirrorReflections = [
-  'assets/item-mirror.png',
-  'assets/mirrorgirl.png',
-  'assets/mirrorpool.png',
-  'assets/mirrorhall.png',
-  'assets/mirrorchurch.png'
-];
+const mirrorReflections = ['assets/item-mirror.png', 'assets/mirrorgirl.png', 'assets/mirrorpool.png', 'assets/mirrorhall.png', 'assets/mirrorchurch.png'];
 let currentMirrorIndex = 0;
 
 setupRoomItem('room-mirror', 'mirror', 
@@ -642,7 +623,6 @@ function triggerPortalPrompt(target, text) {
   }
   dialogueOverlay.classList.remove('hidden');
 }
-
 
 const roomTv = document.getElementById('room-tv');
 let tvState = 0; 
@@ -703,7 +683,6 @@ function startLetterSequence() {
   });
 }
 
-// BUG FIX: Removed the massive delay that locked up the letter sequence!
 function handleLetterCore() {
   isCheckpointActive = true;
   displayCheckpoint({
@@ -726,7 +705,7 @@ setInterval(() => {
     echoes += echoesPerSecond / 10;
     updateUI();
 
-    if (!firstTeaTriggered && echoes >= 500 && !isCheckpointActive && !isDialogueReady) {
+    if (!firstTeaTriggered && echoes >= 500 && !isCheckpointActive && !isDialogueReady && !isTarotPromptReady) {
       firstTeaTriggered = true;
       triggerTeaTime();
       startTeaTimerInterval();
@@ -761,9 +740,18 @@ function displayCheckpoint(cp) {
   dialogueOverlay.classList.remove('hidden');
 }
 
-// BUG FIX: Adjusted delays to prevent the letter race conditions
+// THE NEW TAROT START ACTION ADDED HERE!
 function handleChoice(choice, cp) {
   if (choice.path) { paths[choice.path] += 1; }
+
+  // IF IT'S THE TAROT PROMPT, START THE SHUFFLE SEQUENCE!
+  if (choice.action === "startTarot") {
+    dialogueOverlay.classList.add('hidden');
+    setTimeout(() => { isCheckpointActive = false; }, 500);
+    isTarotPromptReady = false; 
+    startShuffleSequence();
+    return;
+  }
 
   if (choice.action === "letter1") { liminalDrift = Math.max(0, liminalDrift - 5); driftBarFill.style.width = `${liminalDrift}%`; }
   if (choice.action === "letter2") { liminalDrift = Math.min(99, liminalDrift + 5); driftBarFill.style.width = `${liminalDrift}%`; }
@@ -776,8 +764,6 @@ function handleChoice(choice, cp) {
   if (choice.followUp) {
     dialogueText.innerText = choice.followUp;
     dialogueChoices.innerHTML = '';
-    
-    // Instantly transition if it's the letter logic to stop the freezing!
     setTimeout(() => {
       if(choice.action && choice.action.includes('letter')) {
           handleLetterCore(); 
@@ -832,19 +818,9 @@ function startTeaTimer(cp) {
   }, 15000);
 }
 
-// --- TRUE TAROT ENGINE WITH BUG FIXES ---
-const tarotLayer = document.getElementById('tarot-layer');
-const card1Front = document.getElementById('card-1-front');
-const card2Front = document.getElementById('card-2-front');
-const card3Front = document.getElementById('card-3-front');
 
-// NEW UI ELEMENTS FOR DIALOGUE
-const tarotDialogueBox = document.getElementById('tarot-dialogue-box');
-const tarotDialogueText = document.getElementById('tarot-dialogue-text');
-
-let currentTarotDraw = []; 
-
-function triggerInfiniteTarot() {
+// --- THE SHUFFLE SEQUENCE OVERLAY ANIMATION ---
+function startShuffleSequence() {
   isTarotActive = true;
   gameplayAudio.pause();
   tvOnAudio.pause();
@@ -855,14 +831,33 @@ function triggerInfiniteTarot() {
 
   document.getElementById('ui-layer').classList.add('hidden');
   document.getElementById('mote-container').classList.add('hidden');
-  
-  // BUG FIX: We only hide the desk character, NOT the room items!
   document.getElementById('desk-layer').classList.add('hidden');
-  
   shopToggleBtn.classList.add('hidden'); 
-  tarotLayer.classList.remove('hidden');
   
-  // Hide dialogue box to start
+  tarotLayer.classList.remove('hidden');
+
+  // Trigger the Shuffle GIF/Animation screen
+  const shuffleOverlay = document.getElementById('shuffle-overlay');
+  shuffleOverlay.classList.remove('hidden');
+
+  // Wait 2.5 seconds, then deal the cards!
+  setTimeout(() => {
+    shuffleOverlay.classList.add('hidden');
+    triggerInfiniteTarot();
+  }, 2500);
+}
+
+
+const tarotLayer = document.getElementById('tarot-layer');
+const card1Front = document.getElementById('card-1-front');
+const card2Front = document.getElementById('card-2-front');
+const card3Front = document.getElementById('card-3-front');
+const tarotDialogueBox = document.getElementById('tarot-dialogue-box');
+const tarotDialogueText = document.getElementById('tarot-dialogue-text');
+
+let currentTarotDraw = []; 
+
+function triggerInfiniteTarot() {
   tarotDialogueBox.classList.add('hidden');
   tarotDialogueText.innerText = '';
 
@@ -890,7 +885,6 @@ document.querySelectorAll('.tarot-card').forEach((card, index) => {
       cardFlipAudio.cloneNode().play().catch(()=>{});
       card.classList.add('flipped');
       
-      // TRIGGER THE NEW CHARACTER REACTION DIALOGUE!
       tarotDialogueBox.classList.remove('hidden');
       tarotDialogueText.innerText = currentTarotDraw[index].reaction || `She silently traces the edges of the ${currentTarotDraw[index].name}...`;
       
@@ -900,7 +894,6 @@ document.querySelectorAll('.tarot-card').forEach((card, index) => {
          document.getElementById('ui-layer').classList.remove('hidden');
          document.getElementById('tarot-layer').classList.add('hidden');
          
-         // THE FIX: Unhide everything so items stay on table!
          document.getElementById('mote-container').classList.remove('hidden');
          document.getElementById('desk-layer').classList.remove('hidden');
          document.getElementById('room-items-layer').classList.remove('hidden');
