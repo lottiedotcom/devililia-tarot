@@ -88,11 +88,15 @@
         <div id="chime-timer">15</div>
     </div>
 
-    <!-- LAYER 8: The Tarot Reading -->
     <div id="tarot-layer" class="layer hidden">
         <img src="assets/top-viewoftable.png" id="tarot-bg" draggable="false" alt="Top view of table">
         
-        <!-- NEW: Tarot Dialogue Box -->
+        <!-- NEW: Shuffling Animation Screen -->
+        <div id="shuffle-overlay" class="layer hidden">
+            <div class="deck-shuffle"></div>
+            <div class="shuffle-text">Shuffling...</div>
+        </div>
+
         <div id="tarot-dialogue-box" class="hidden">
             <p id="tarot-dialogue-text"></p>
         </div>
@@ -114,4 +118,3 @@
     </script>
 </body>
 </html>
-
