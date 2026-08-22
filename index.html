@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,17 +10,12 @@
 </head>
 <body>
 
-    <!-- LAYER 1: Background -->
     <div id="background-layer" class="layer"></div>
 
-    <!-- LAYER 1.5: Room Scrapbook (Purchased Items) -->
     <div id="room-items-layer" class="layer">
-        <!-- Wall Items -->
         <img id="room-clock" src="assets/item-clock.png" class="room-item hidden" draggable="false" alt="Clock">
         <img id="room-mirror" src="assets/item-mirror.png" class="room-item hidden" draggable="false" alt="Mirror">
         <img id="room-polaroid" src="assets/item-polaroid.png" class="room-item hidden" draggable="false" alt="Polaroid">
-        
-        <!-- Desk & Floor Items -->
         <img id="room-letter" src="assets/item-letter.png" class="room-item hidden" draggable="false" alt="Letter">
         <img id="room-hourglass" src="assets/item-hourglass.png" class="room-item hidden" draggable="false" alt="Hourglass">
         <img id="room-moontear" src="assets/item-moontear.png" class="room-item hidden" draggable="false" alt="Moon Tear Jar">
@@ -29,22 +23,16 @@
         <img id="room-pillow" src="assets/item-pillow.png" class="room-item hidden" draggable="false" alt="Ghost Cat Pillow">
     </div>
 
-    <!-- LAYER 2: Devililia and the Desk (RESTORED) -->
     <div id="desk-layer" class="layer">
         <img src="assets/deskwithorb.png" id="desk-image" draggable="false" alt="Devililia at her desk">
     </div>
 
-    <!-- LAYER 3: The Active Game Area (Orb & Motes) -->
     <div id="mote-container" class="layer">
         <img src="assets/orb.png" id="crystal-orb" draggable="false" alt="Aether Dial">
     </div>
 
-    <!-- LAYER 4: The User Interface -->
     <div id="ui-layer" class="layer">
-        
-        <!-- SAFE PLACEMENT FOR DIALOGUE INDICATOR -->
         <div id="dialogue-indicator" class="hidden">!</div>
-
         <button id="music-toggle-btn">🔇</button>
 
         <div id="top-hud">
@@ -62,18 +50,14 @@
         </div>
 
         <button id="btn-tarot-reading" class="hidden">Ask for the Reading</button>
-
         <button id="shop-toggle-btn">Open Machine</button>
 
         <div id="shop-container">
             <h3>The Aether Machine</h3>
-            <div class="shop-grid" id="shop-items">
-                <!-- Shop items injected via JS -->
-            </div>
+            <div class="shop-grid" id="shop-items"></div>
         </div>
     </div>
 
-    <!-- LAYER 5: Psychological Dialogue Modal -->
     <div id="dialogue-overlay" class="layer hidden">
         <div class="dialogue-box">
             <p id="dialogue-text"></p>
@@ -81,7 +65,6 @@
         </div>
     </div>
 
-    <!-- LAYER 5.5: CUTE LORE INSPECTION OVERLAY -->
     <div id="lore-overlay" class="layer hidden">
         <div class="lore-box">
             <img id="lore-image" src="" alt="Inspected Item">
@@ -90,7 +73,6 @@
         </div>
     </div>
 
-    <!-- LAYER 6: Tea Timer Overlay -->
     <div id="tea-timer-overlay" class="layer hidden">
         <div class="tea-container">
             <img src="assets/teacup.png" alt="Chamomile Tea" id="tea-icon">
@@ -101,7 +83,6 @@
         </div>
     </div>
 
-    <!-- LAYER 7: Hourly Chime Overlay -->
     <div id="chime-overlay" class="layer hidden">
         <div id="chime-particles"></div>
         <div id="chime-timer">15</div>
@@ -110,25 +91,16 @@
     <!-- LAYER 8: The Tarot Reading -->
     <div id="tarot-layer" class="layer hidden">
         <img src="assets/top-viewoftable.png" id="tarot-bg" draggable="false" alt="Top view of table">
+        
+        <!-- NEW: Tarot Dialogue Box -->
+        <div id="tarot-dialogue-box" class="hidden">
+            <p id="tarot-dialogue-text"></p>
+        </div>
+
         <div id="card-container">
-            <div class="tarot-card" id="card-1">
-                <div class="card-inner">
-                    <div class="card-back"></div>
-                    <div class="card-front" id="card-1-front">Card 1</div>
-                </div>
-            </div>
-            <div class="tarot-card" id="card-2">
-                <div class="card-inner">
-                    <div class="card-back"></div>
-                    <div class="card-front" id="card-2-front">Card 2</div>
-                </div>
-            </div>
-            <div class="tarot-card" id="card-3">
-                <div class="card-inner">
-                    <div class="card-back"></div>
-                    <div class="card-front" id="card-3-front">Card 3</div>
-                </div>
-            </div>
+            <div class="tarot-card" id="card-1"><div class="card-inner"><div class="card-back"></div><div class="card-front" id="card-1-front"></div></div></div>
+            <div class="tarot-card" id="card-2"><div class="card-inner"><div class="card-back"></div><div class="card-front" id="card-2-front"></div></div></div>
+            <div class="tarot-card" id="card-3"><div class="card-inner"><div class="card-back"></div><div class="card-front" id="card-3-front"></div></div></div>
         </div>
     </div>
 
@@ -142,3 +114,4 @@
     </script>
 </body>
 </html>
+
